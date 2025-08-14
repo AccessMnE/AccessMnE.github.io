@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Job Code List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: #2196F3;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .search-box {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+
+        .job-list {
+            padding: 0;
+        }
+
+        .job-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .job-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .job-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .job-code {
+            font-weight: 600;
+            color: #2196F3;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .job-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+
+        .copy-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #45a049;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.copied {
+            background: #FF9800;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #333;
+            color: white;
+            padding: 8px 15px;
+            text-align: center;
+            font-size: 12px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .status-bar.show {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            .job-item {
+                padding: 12px 15px;
+            }
+            
+            .copy-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+        }
+
+        /* WhatsApp 优化样式 */
+        .whatsapp-mode {
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        .whatsapp-mode .job-item {
+            padding: 10px 12px;
+        }
+
+        .whatsapp-mode .job-code {
+            font-size: 14px;
+        }
+
+        .whatsapp-mode .job-description {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="header">
+            <h1>Job Code List</h1>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索 Job Code 或描述...">
+        </div>
+        
+        <div class="job-list" id="jobList">
+            <!-- Job items will be populated here -->
+        </div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+        已复制到剪贴板
+    </div>
+
+    <script>
+        // 模拟数据 - 实际使用时替换为 API 调用
+        const mockJobs = [
+            { code: "JOB-001", description: "设备维护 - 生产线A" },
+            { code: "JOB-002", description: "安全检查 - 车间B" },
+            { code: "JOB-003", description: "物料搬运 - 仓库C" },
+            { code: "JOB-004", description: "质量检测 - 产品线D" },
+            { code: "JOB-005", description: "清洁工作 - 办公区" },
+            { code: "JOB-006", description: "设备校准 - 实验室" },
+            { code: "JOB-007", description: "库存盘点 - 主仓库" },
+            { code: "JOB-008", description: "安全培训 - 会议室" }
+        ];
+
+        let currentJobs = [...mockJobs];
+        let filteredJobs = [...mockJobs];
+
+        // DOM 元素
+        const jobList = document.getElementById('jobList');
+        const searchInput = document.getElementById('searchInput');
+        const statusBar = document.getElementById('statusBar');
+        const container = document.getElementById('container');
+
+        // 初始化
+        function init() {
+            renderJobs();
+            setupEventListeners();
+            setupWhatsAppMode();
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            searchInput.addEventListener('input', handleSearch);
+            searchInput.addEventListener('focus', () => {
+                // 移动端键盘弹出时优化
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 300);
+            });
+        }
+
+        // 搜索处理
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (!query) {
+                filteredJobs = [...currentJobs];
+            } else {
+                filteredJobs = currentJobs.filter(job => 
+                    job.code.toLowerCase().includes(query) ||
+                    job.description.toLowerCase().includes(query)
+                );
+            }
+            
+            renderJobs();
+        }
+
+        // 渲染 Job 列表
+        function renderJobs() {
+            if (filteredJobs.length === 0) {
+                jobList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>没有找到匹配的 Job</h3>
+                        <p>请尝试其他搜索关键词</p>
+                    </div>
+                `;
+                return;
+            }
+
+            jobList.innerHTML = filteredJobs.map(job => `
+                <div class="job-item">
+                    <div class="job-info">
+                        <div class="job-code">${job.code}</div>
+                        <div class="job-description">${job.description}</div>
+                    </div>
+                    <button class="copy-btn" onclick="copyJobCode('${job.code}')">
+                        复制
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 复制 Job Code
+        async function copyJobCode(code) {
+            const textToCopy = `#${code}`;
+            
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                showStatus('已复制到剪贴板');
+                
+                // 更新按钮状态
+                const btn = event.target;
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = '复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+                
+            } catch (err) {
+                // 降级方案
+                fallbackCopyTextToClipboard(textToCopy);
+                showStatus('已复制到剪贴板');
+            }
+        }
+
+        // 降级复制方案
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('复制失败:', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // 显示状态栏
+        function showStatus(message) {
+            statusBar.textContent = message;
+            statusBar.classList.add('show');
+            
+            setTimeout(() => {
+                statusBar.classList.remove('show');
+            }, 2000);
+        }
+
+        // WhatsApp 模式优化
+        function setupWhatsAppMode() {
+            // 检测是否为移动设备
+            if (window.innerWidth <= 480) {
+                container.classList.add('whatsapp-mode');
+            }
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', () => {
+                if (window.innerWidth <= 480) {
+                    container.classList.add('whatsapp-mode');
+                } else {
+                    container.classList.remove('whatsapp-mode');
+                }
+            });
+        }
+
+        // 启动应用
+        init();
+
+        // 预留 API 接口
+        async function fetchJobs() {
+            // TODO: 实现从服务器获取数据
+            // const response = await fetch('http://localhost:YOUR_PORT/api/jobs');
+            // const jobs = await response.json();
+            // return jobs;
+        }
+
+        async function updateJobs() {
+            // TODO: 实现数据更新
+            // const jobs = await fetchJobs();
+            // currentJobs = jobs;
+            // filteredJobs = [...jobs];
+            // renderJobs();
+        }
+    </script>
+</body>
+</html>
