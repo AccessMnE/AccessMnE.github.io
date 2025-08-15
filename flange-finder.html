@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flange finder</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .flange-finder-box {
+            background: #eaf2fb;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(10,61,145,0.08);
+            padding: 2em 2em 1.5em 2em;
+            margin: 2em auto 2.5em auto;
+            max-width: 480px;
+            text-align: center;
+        }
+        .flange-finder-box input, .flange-finder-box select {
+            font-size: 1.1em;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            border: 1px solid #0a3d91;
+            margin-bottom: 1em;
+            width: 70%;
+        }
+        .flange-finder-result {
+            font-size: 1.1em;
+            color: #0a3d91;
+            font-weight: bold;
+            margin-top: 1em;
+            text-align: left;
+        }
+        .flange-list-table {
+            margin: 2em auto 0 auto;
+            background: transparent;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(10,61,145,0.04);
+        }
+        .flange-list-table th, .flange-list-table td {
+            border: 1px solid #b3c6e0;
+            padding: 0.5em 0.7em;
+            text-align: center;
+            background: transparent;
+        }
+        .flange-list-table th {
+            background: #0a3d91;
+            color: #fff;
+        }
+        .copy-btn {
+            background: #0a3d91;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.3em 0.8em;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover {
+            background: #003366;
+        }
+        .doc-link-btn {
+            background: #ffd700;
+            color: #0a3d91;
+            border: none;
+            border-radius: 8px;
+            padding: 0.3em 0.8em;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .doc-link-btn:hover {
+            background: #ffe066;
+        }
+    </style>
+</head>
+<body>
+    <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
+    <!-- Main content -->
+    <h1>Flange Finder</h1>
+    <div class="flange-finder-box">
+        <h2>Find Your Flange</h2>
+        <label for="nominal-input">Nominal Size (inches, e.g. 2 or 2.5):</label><br>
+        <input type="text" id="nominal-input" placeholder="e.g. 2 or 2.5"><br>
+        <label for="hole-input">No. of Holes:</label><br>
+        <input type="number" id="hole-input" placeholder="e.g. 4"><br>
+        <label for="pcd-input">PCD (mm):</label><br>
+        <input type="number" id="pcd-input" placeholder="e.g. 105"><br>
+        <div id="flange-result" class="flange-finder-result"></div>
+    </div>
+    <script>
+        // 法兰数据
+        const flangeData = [
+            // JIS 5K
+            {std:'JIS 5K', nominal:'0.5', holes:4, pcd:60},
+            {std:'JIS 5K', nominal:'0.75', holes:4, pcd:65},
+            {std:'JIS 5K', nominal:'1', holes:4, pcd:75},
+            {std:'JIS 5K', nominal:'1.25', holes:4, pcd:90},
+            {std:'JIS 5K', nominal:'1.5', holes:4, pcd:95},
+            {std:'JIS 5K', nominal:'2', holes:4, pcd:105},
+            {std:'JIS 5K', nominal:'2.5', holes:4, pcd:130},
+            {std:'JIS 5K', nominal:'3', holes:4, pcd:145},
+            {std:'JIS 5K', nominal:'4', holes:8, pcd:165},
+            {std:'JIS 5K', nominal:'5', holes:8, pcd:200},
+            {std:'JIS 5K', nominal:'6', holes:8, pcd:230},
+            {std:'JIS 5K', nominal:'8', holes:8, pcd:280},
+            {std:'JIS 5K', nominal:'10', holes:12, pcd:345},
+            {std:'JIS 5K', nominal:'12', holes:12, pcd:390},
+            // JIS 10K
+            {std:'JIS 10K', nominal:'0.5', holes:4, pcd:70},
+            {std:'JIS 10K', nominal:'0.75', holes:4, pcd:75},
+            {std:'JIS 10K', nominal:'1', holes:4, pcd:90},
+            {std:'JIS 10K', nominal:'1.25', holes:4, pcd:100},
+            {std:'JIS 10K', nominal:'1.5', holes:4, pcd:105},
+            {std:'JIS 10K', nominal:'2', holes:4, pcd:120},
+            {std:'JIS 10K', nominal:'2.5', holes:4, pcd:140},
+            {std:'JIS 10K', nominal:'3', holes:8, pcd:150},
+            {std:'JIS 10K', nominal:'4', holes:8, pcd:175},
+            {std:'JIS 10K', nominal:'5', holes:8, pcd:210},
+            {std:'JIS 10K', nominal:'6', holes:8, pcd:240},
+            {std:'JIS 10K', nominal:'8', holes:12, pcd:290},
+            {std:'JIS 10K', nominal:'10', holes:12, pcd:355},
+            {std:'JIS 10K', nominal:'12', holes:12, pcd:410},
+            // BS PN6
+            {std:'BS PN6', nominal:'0.5', holes:4, pcd:65},
+            {std:'BS PN6', nominal:'0.75', holes:4, pcd:75},
+            {std:'BS PN6', nominal:'1', holes:4, pcd:85},
+            {std:'BS PN6', nominal:'1.25', holes:4, pcd:100},
+            {std:'BS PN6', nominal:'1.5', holes:4, pcd:110},
+            {std:'BS PN6', nominal:'2', holes:4, pcd:125},
+            {std:'BS PN6', nominal:'2.5', holes:4, pcd:145},
+            {std:'BS PN6', nominal:'3', holes:4, pcd:160},
+            {std:'BS PN6', nominal:'4', holes:8, pcd:180},
+            {std:'BS PN6', nominal:'5', holes:8, pcd:210},
+            {std:'BS PN6', nominal:'6', holes:8, pcd:240},
+            {std:'BS PN6', nominal:'8', holes:8, pcd:295},
+            {std:'BS PN6', nominal:'10', holes:12, pcd:355},
+            {std:'BS PN6', nominal:'12', holes:12, pcd:430},
+            // 用户优先BS PN16数据
+            {std:'BS PN16', nominal:'0.375', holes:4, pcd:60},
+            {std:'BS PN16', nominal:'0.5', holes:4, pcd:65},
+            {std:'BS PN16', nominal:'0.75', holes:4, pcd:75},
+            {std:'BS PN16', nominal:'1', holes:4, pcd:85},
+            {std:'BS PN16', nominal:'1.25', holes:4, pcd:100},
+            {std:'BS PN16', nominal:'1.5', holes:4, pcd:110},
+            {std:'BS PN16', nominal:'2', holes:4, pcd:125},
+            {std:'BS PN16', nominal:'2.5', holes:8, pcd:145},
+            {std:'BS PN16', nominal:'3', holes:8, pcd:160},
+            {std:'BS PN16', nominal:'4', holes:8, pcd:180},
+            {std:'BS PN16', nominal:'5', holes:8, pcd:210},
+            {std:'BS PN16', nominal:'6', holes:8, pcd:240},
+            {std:'BS PN16', nominal:'8', holes:12, pcd:295},
+            {std:'BS PN16', nominal:'10', holes:12, pcd:355},
+            {std:'BS PN16', nominal:'12', holes:12, pcd:410},
+            {std:'BS PN16', nominal:'14', holes:16, pcd:470},
+            {std:'BS PN16', nominal:'16', holes:16, pcd:525},
+            {std:'BS PN16', nominal:'18', holes:20, pcd:585},
+            {std:'BS PN16', nominal:'20', holes:20, pcd:650},
+            {std:'BS PN16', nominal:'24', holes:20, pcd:770},
+            {std:'BS PN16', nominal:'28', holes:24, pcd:840},
+            {std:'BS PN16', nominal:'32', holes:24, pcd:950},
+            {std:'BS PN16', nominal:'36', holes:28, pcd:1050},
+            {std:'BS PN16', nominal:'40', holes:28, pcd:1170},
+            {std:'BS PN16', nominal:'48', holes:32, pcd:1390},
+            {std:'BS PN16', nominal:'56', holes:36, pcd:1590},
+            {std:'BS PN16', nominal:'64', holes:40, pcd:1820}
+        ];
+        function parseNominal(val) {
+            // 支持 1 1/2 或 1.5
+            if (!val) return null;
+            val = val.trim().replace('"','');
+            if (val.includes('/')) {
+                // 1 1/2 -> 1.5
+                const parts = val.split(' ');
+                if (parts.length === 2) {
+                    const n = parseInt(parts[0]);
+                    const frac = parts[1].split('/');
+                    if (frac.length === 2) {
+                        return (n + parseInt(frac[0])/parseInt(frac[1])).toString();
+                    }
+                }
+            }
+            return parseFloat(val).toString();
+        }
+        function getDocLink(std) {
+            if (std.startsWith('BS PN16')) return 'flange_docs/bs_pn16_user.txt';
+            // 预留文档链接，后续可补充PDF
+            if (std.startsWith('JIS 5K')) return 'flange_docs/jis5k.pdf';
+            if (std.startsWith('JIS 10K')) return 'flange_docs/jis10k.pdf';
+            if (std.startsWith('BS PN6')) return 'flange_docs/bs_pn6.pdf';
+            if (std.startsWith('BS PN25')) return 'flange_docs/bs_pn25.pdf';
+            if (std.startsWith('ANSI 150')) return 'flange_docs/ansi150.pdf';
+            if (std.startsWith('ANSI 300')) return 'flange_docs/ansi300.pdf';
+            return null;
+        }
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(()=>{
+                alert('Copied: ' + text);
+            });
+        }
+        function findFlanges() {
+            const nominal = parseNominal(document.getElementById('nominal-input').value);
+            const holes = parseInt(document.getElementById('hole-input').value);
+            const pcd = parseFloat(document.getElementById('pcd-input').value);
+            let results = [];
+            if (nominal && holes && pcd) {
+                results = flangeData.filter(row => {
+                    return row.nominal === nominal && row.holes === holes && Math.abs(row.pcd - pcd) <= 10;
+                });
+            }
+            let html = '';
+            if (results.length > 0) {
+                html += '<table class="flange-list-table"><tr><th>Copy</th><th>Standard</th><th>Nominal Size (in)</th><th>No. of Holes</th><th>PCD (mm)</th><th>Open Document</th></tr>';
+                for (const row of results) {
+                    const docLink = getDocLink(row.std);
+                    html += `<tr>`+
+                        `<td><button class='copy-btn' onclick=\"copyToClipboard('${row.std} ${row.nominal}')\">Copy</button></td>`+
+                        `<td>${row.std}</td>`+
+                        `<td>${row.nominal}</td>`+
+                        `<td>${row.holes}</td>`+
+                        `<td>${row.pcd}</td>`+
+                        `<td>`+(docLink?`<a class='doc-link-btn' href='${docLink}' target='_blank'>Open Document</a>`:'')+`</td>`+
+                        `</tr>`;
+                }
+                html += '</table>';
+            } else if (nominal || holes || pcd) {
+                html = '<div style="color:#c00;">No matching flange found (±10mm PCD).</div>';
+            }
+            document.getElementById('flange-result').innerHTML = html;
+        }
+        document.getElementById('nominal-input').addEventListener('input', findFlanges);
+        document.getElementById('hole-input').addEventListener('input', findFlanges);
+        document.getElementById('pcd-input').addEventListener('input', findFlanges);
+    </script>
+</body>
+</html>

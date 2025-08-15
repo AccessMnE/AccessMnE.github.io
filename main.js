@@ -34,6 +34,43 @@
   const workerTotal = document.getElementById("worker-total");
   const tableBody = document.getElementById("table-body");
 
+  // ========== 导出文本功能 ========== //
+  const exportBtn = document.getElementById("export-btn");
+  const exportModal = document.getElementById("export-modal");
+  const exportText = document.getElementById("export-text");
+  const exportCopy = document.getElementById("export-copy");
+  const exportClose = document.getElementById("export-close");
+  const exportDay = document.getElementById("export-day");
+  const exportDate = document.getElementById("export-date");
+
+  if (exportBtn && exportModal && exportText && exportCopy && exportClose && exportDay && exportDate) {
+    exportBtn.addEventListener("click", () => {
+      // 生成导出文本
+      const day = exportDay.value;
+      const date = exportDate.value.trim();
+      let output = `【${DAY_LABELS[day]}】${date ? " " + date : ""}\n`;
+      output += "Job Code\tWorker\n";
+      state.rows.forEach(row => {
+        const workers = row.assignments[day] || [];
+        if (workers.length === 0) return;
+        workers.forEach(w => {
+          output += `${row.jobCode || "-"}\t${w}\n`;
+        });
+      });
+      exportText.value = output;
+      exportModal.classList.remove("hidden");
+    });
+    exportClose.addEventListener("click", () => {
+      exportModal.classList.add("hidden");
+    });
+    exportCopy.addEventListener("click", () => {
+      exportText.select();
+      document.execCommand("copy");
+      exportCopy.textContent = "已复制";
+      setTimeout(() => (exportCopy.textContent = "复制"), 1200);
+    });
+  }
+
   // Init
   renderWorkers();
   renderTable();

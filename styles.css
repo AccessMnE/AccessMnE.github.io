@@ -13,10 +13,71 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  background: radial-gradient(1200px 600px at 10% -20%, #1a2352 0%, #0b1020 40%), var(--bg);
-  color: var(--text);
+    background: #fff;
+    color: #222;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background: #0a3d91;
+    color: #fff;
+    padding: 0.5em 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.logo {
+    height: 64px;
+    margin-bottom: 2em;
+}
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1.5em;
+}
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.1em;
+    transition: color 0.2s;
+}
+nav ul li a:hover {
+    color: #ffd700;
+}
+.main-content {
+    max-width: 900px;
+    margin: 2em auto;
+    padding: 2em;
+    background: #f7faff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(10,61,145,0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.home-btn {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    background: #0a3d91;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 0.7em 1.6em;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(10,61,145,0.08);
+    z-index: 1000;
+    transition: background 0.2s;
+}
+.home-btn:hover {
+    background: #003366;
 }
 
 .app-header, .app-footer {
@@ -26,9 +87,26 @@ body {
 }
 .app-footer { border-top: 1px solid var(--border); border-bottom: 0; }
 .app-header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 8px 8px 4px 8px;
+  min-height: unset;
 }
-.actions { display: flex; gap: 8px; }
+.app-header p {
+  color: #fff;
+  margin: 0.2em 0 0.4em 0;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
 .export-controls { display: flex; gap: 8px; align-items: center; }
 select, .actions input[type="text"] { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #0e1533; color: var(--text); }
 button { cursor: pointer; }
@@ -75,8 +153,39 @@ tbody tr:nth-child(even) td { background: rgba(255,255,255,0.06); }
 .jobdetail-wrapper { margin-top: 16px; }
 .droppable { min-height: 38px; background: rgba(255,255,255,0.02); border: 1px dashed transparent; border-radius: 6px; padding: 6px; }
 .droppable.drag-over { border-color: var(--primary); background: rgba(91,140,255,0.08); }
-.cell-badges { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 6px; }
-.badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 999px; background: #0f1a40; }
+.cell-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* 让 badge 拉满宽度 */
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #0f1a40;
+  width: 100%;           /* 拉满 cell */
+  min-width: 0;          /* 防止溢出 */
+  font-size: 0.92em;     /* 字体缩小一点 */
+  white-space: nowrap;   /* 不换行（如需换行可改为 normal） */
+  overflow: hidden;      /* 超出部分隐藏 */
+  text-overflow: ellipsis; /* 超出显示省略号 */
+}
+
+.badge .worker-name, .badge span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.92em;
+  color: #fff; /* 白色 */
+  font-weight: bold;
+}
 .badge .remove { background: transparent; border: 0; color: var(--danger); cursor: pointer; }
 .cell-subtotal { color: var(--muted); font-size: 12px; }
 .worker-draggable { user-select: none; }
@@ -97,5 +206,86 @@ tbody tr:nth-child(even) td { background: rgba(255,255,255,0.06); }
 .copy-btn { background: var(--primary); }
 .close-btn { background: transparent; border: 1px solid var(--border); color: var(--text); }
 .export-text { width: 100%; padding: 12px; background: #0a1333; border: 0; color: var(--text); outline: none; resize: vertical; min-height: 50vh; }
+
+.center-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+    justify-content: center;
+    margin-bottom: 2.5em;
+}
+
+.center-nav a {
+    display: inline-block;
+    background: #0a3d91;
+    color: #fff;
+    font-size: 1.25em;
+    font-weight: bold;
+    padding: 1em 2.2em;
+    border-radius: 2em;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(10,61,145,0.13);
+    transition: background 0.2s, transform 0.2s;
+    letter-spacing: 0.03em;
+}
+
+.center-nav a:hover {
+    background: #003366;
+    transform: translateY(-2px) scale(1.04);
+}
+
+h1 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    color: #0a3d91;
+    font-size: 2.2em;
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    color: #222;
+    font-size: 1.1em;
+}
+
+.pipeod-doc-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2em;
+    margin: 2em 0 2.5em 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pipeod-doc-link {
+    display: flex;
+    align-items: center;
+    background: #0a3d91;
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: 500;
+    padding: 1em 2.2em 1em 1.2em;
+    border-radius: 2em;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(10,61,145,0.13);
+    transition: background 0.2s, transform 0.2s;
+    letter-spacing: 0.01em;
+    min-width: 320px;
+    justify-content: flex-start;
+    gap: 0.8em;
+}
+
+.pipeod-doc-link:hover {
+    background: #003366;
+    transform: translateY(-2px) scale(1.04);
+    color: #ffd700;
+}
+
+.pipeod-doc-link .doc-icon {
+    font-size: 1.5em;
+    margin-right: 0.5em;
+    color: #ffd700;
+}
 
 

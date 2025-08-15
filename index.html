@@ -1,103 +1,28 @@
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>排班表</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="app-header">
-      <h1>排班表</h1>
-      <div class="actions">
-        <button id="add-row">+ 添加 Job Code 行</button>
-        <button id="clear-all" class="danger">清空数据</button>
-        <div class="export-controls">
-          <select id="export-day" title="选择星期">
-            <option value="mon">Monday</option>
-            <option value="tue">Tuesday</option>
-            <option value="wed">Wednesday</option>
-            <option value="thu">Thursday</option>
-            <option value="fri">Friday</option>
-            <option value="sat">Saturday</option>
-            <option value="sun">Sunday</option>
-          </select>
-          <input id="export-date" type="text" placeholder="输入日期 (如: 2025-08-12)" />
-          <button id="export-btn">导出文本</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access MNE</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-content">
+        <img src="access logo.png" alt="Access Logo" class="logo">
+        <div class="center-nav">
+            <a href="index.html">Home</a>
+            <a href="job-list.html">Job Code</a>
+            <a href="schedule-board.html">Work Schedule Board</a>
+            <a href="about.html">About</a>
+            <a href="pipe-od.html">Pipe OD</a>
+            <a href="flange-finder.html">Flange Finder</a>
+            <a href="installation-guide.html">Installation Guide</a>
+            <a href="office-calendar.html">Office Calendar</a>
+            <a href="tem-list.html">TEM List</a>
+            <a href="other.html">Other</a>
         </div>
-      </div>
-    </header>
-
-    <main class="layout">
-      <aside class="sidebar">
-        <h2>Worker 列表</h2>
-        <div class="worker-input">
-          <input id="worker-name" type="text" placeholder="输入 worker 名称" />
-          <button id="add-worker">添加</button>
-        </div>
-        <ul id="worker-list" class="worker-list"></ul>
-        <div class="sidebar-footer">
-          <span id="worker-total">总数：0</span>
-        </div>
-      </aside>
-
-      <section class="board">
-        <div class="table-wrapper">
-          <table id="schedule-table">
-            <colgroup>
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th class="col-job">Job Code</th>
-                <th>Monday</th>
-                <th>Tuesday</th>
-                <th>Wednesday</th>
-                <th>Thursday</th>
-                <th>Friday</th>
-                <th>Saturday</th>
-                <th>Sunday</th>
-                <th>Opertaion</th>
-              </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-          </table>
-        </div>
-
-        
-      </section>
-    </main>
-
-    <footer class="app-footer">
-      <span>数据保存在浏览器本地（LocalStorage）。</span>
-    </footer>
-
-    <!-- 导出弹窗 -->
-    <div id="export-modal" class="modal hidden" role="dialog" aria-modal="true">
-      <div class="modal-backdrop"></div>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>导出文本</h3>
-          <div class="spacer"></div>
-          <button id="export-copy" class="copy-btn">复制</button>
-          <button id="export-close" class="close-btn">关闭</button>
-        </div>
-        <div class="modal-body">
-          <textarea id="export-text" class="export-text" rows="16"></textarea>
-        </div>
-      </div>
+        <h1>Welcome to Access MNE</h1>
+        <p>Please use the navigation buttons above to access the corresponding feature pages.</p>
     </div>
-
-    <script src="main.js"></script>
-  </body>
-  </html>
-
-
+</body>
+</html>

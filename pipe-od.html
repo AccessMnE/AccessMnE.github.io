@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipe od</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .od-identifier-box {
+            background: #eaf2fb;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(10,61,145,0.08);
+            padding: 2em 2em 1.5em 2em;
+            margin: 2em auto 2.5em auto;
+            max-width: 420px;
+            text-align: center;
+        }
+        .od-identifier-box input {
+            font-size: 1.2em;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            border: 1px solid #0a3d91;
+            margin-bottom: 1em;
+            width: 70%;
+        }
+        .od-identifier-result {
+            font-size: 1.2em;
+            color: #0a3d91;
+            font-weight: bold;
+            margin-top: 0.7em;
+        }
+    </style>
+</head>
+<body>
+    <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
+    <!-- Main content -->
+    <h1>Pipe OD</h1>
+    <div class="od-identifier-box">
+        <h2>OD Identifier</h2>
+        <label for="od-input">Enter OD (mm):</label><br>
+        <input type="number" id="od-input" placeholder="e.g. 114.3">
+        <div id="od-result" class="od-identifier-result"></div>
+    </div>
+    <p>Below are related documents for Pipe OD. Click to view or download:</p>
+    <ul class="pipeod-doc-list">
+        <li><a class="pipeod-doc-link" href="pipe od/ANSI pipe schedule.pdf" target="_blank"><span class="doc-icon">📄</span>ANSI pipe schedule.pdf</a></li>
+        <li><a class="pipeod-doc-link" href="pipe od/Iplex-PVC-U-Pressure-Series-1-Pipe-Dimensions.pdf" target="_blank"><span class="doc-icon">📄</span>Iplex-PVC-U-Pressure-Series-1-Pipe-Dimensions.pdf</a></li>
+        <li><a class="pipeod-doc-link" href="pipe od/PEPipeSystem.pdf" target="_blank"><span class="doc-icon">📄</span>PEPipeSystem.pdf</a></li>
+        <li><a class="pipeod-doc-link" href="pipe od/pipe_charts_10S.pdf" target="_blank"><span class="doc-icon">📄</span>pipe_charts_10S.pdf</a></li>
+    </ul>
+    <script>
+        const odTable = [
+            {nominal: '½” DN15', mm: 21.3},
+            {nominal: '¾” DN20', mm: 26.7},
+            {nominal: '1” DN25', mm: 33.4},
+            {nominal: '1 ¼” DN32', mm: 42.2},
+            {nominal: '1 ½” DN40', mm: 48.3},
+            {nominal: '2” DN50', mm: 60.3},
+            {nominal: '2 ½” DN65', mm: 73.0},
+            {nominal: '3” DN80', mm: 88.9},
+            {nominal: '3 ½”', mm: 101.6},
+            {nominal: '4” DN100', mm: 114.3},
+            {nominal: '5” DN125', mm: 141.3},
+            {nominal: '6” DN150', mm: 168.3},
+            {nominal: '8” DN200', mm: 219.1},
+            {nominal: '10” DN250', mm: 273.1},
+            {nominal: '12” DN300', mm: 323.9},
+            {nominal: '14” DN350', mm: 355.6},
+            {nominal: '16” DN400', mm: 406.1},
+            {nominal: '18” DN450', mm: 457.0},
+            {nominal: '20” DN500', mm: 508.0},
+            {nominal: '22” DN550', mm: 559.0},
+            {nominal: '24” DN600', mm: 610.0},
+            {nominal: '30” DN750', mm: 762.0}
+        ];
+        document.getElementById('od-input').addEventListener('input', function() {
+            const val = parseFloat(this.value);
+            let found = null;
+            if (!isNaN(val)) {
+                for (const row of odTable) {
+                    if (Math.abs(row.mm - val) <= 5) {
+                        found = row.nominal + ' (OD: ' + row.mm + ' mm)';
+                        break;
+                    }
+                }
+            }
+            document.getElementById('od-result').textContent = found ? `Nominal size: ${found}` : (this.value ? 'No matching nominal size (±5mm)' : '');
+        });
+    </script>
+</body>
+</html>
