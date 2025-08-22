@@ -12,8 +12,24 @@
             box-shadow: 0 2px 8px rgba(10,61,145,0.08);
             padding: 2em 2em 1.5em 2em;
             margin: 2em auto 2.5em auto;
-            max-width: 480px;
+            max-width: 700px;
+            min-width: 420px;
             text-align: center;
+            position: relative;
+        }
+        .toggle-dn-btn-mini {
+            position: absolute;
+            left: 24px;
+            top: 18px;
+            background: #0a3d91;
+            color: #fff;
+            padding: 0.3em 1.1em;
+            font-size: 1em;
+            border: none;
+            outline: none;
+            border-radius: 8px;
+            min-width: 80px;
+            z-index: 2;
         }
         .flange-finder-box input, .flange-finder-box select {
             font-size: 1.1em;
@@ -81,16 +97,85 @@
     <!-- Main content -->
     <h1>Flange Finder</h1>
     <div class="flange-finder-box">
-        <h2>Find Your Flange</h2>
-        <label for="nominal-input">Nominal Size (inches, e.g. 2 or 2.5):</label><br>
-        <input type="text" id="nominal-input" placeholder="e.g. 2 or 2.5"><br>
-        <label for="hole-input">No. of Holes:</label><br>
-        <input type="number" id="hole-input" placeholder="e.g. 4"><br>
-        <label for="pcd-input">PCD (mm):</label><br>
-        <input type="number" id="pcd-input" placeholder="e.g. 105"><br>
+        <button id="toggle-dn-btn" type="button" class="toggle-dn-btn-mini" onclick="toggleNominalMode()">current：INCH</button>
+        <h2 style="margin-top:0.5em;">Find Your Flange</h2>
+        <div style="display:flex;align-items:center;justify-content:center;margin-bottom:2em;gap:32px;">
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1.2em;width:100%;max-width:420px;">
+                <div style="display:flex;align-items:center;gap:12px;width:100%;">
+                    <label id="nominal-label" for="nominal-input" style="font-size:1.15em;min-width:220px;text-align:right;">Nominal Size (inches, e.g. 2 or 2.5):</label>
+                    <input type="text" id="nominal-input" placeholder="e.g. 2 or 2.5" style="width:220px;font-size:1.15em;padding:0.7em 1.2em;">
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;width:100%;">
+                    <span style="font-size:1.1em;">tolerance±</span>
+                    <select id="pcd-tolerance" style="width:120px;font-size:1.1em;padding:0.6em 1em;">
+                        <option value="5">5mm</option>
+                        <option value="10" selected>10mm</option>
+                        <option value="20">20mm</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;margin-bottom:2em;gap:32px;">
+            <label for="hole-input" style="font-size:1.15em;min-width:120px;text-align:right;">No. of Holes:</label>
+            <input type="number" id="hole-input" placeholder="e.g. 4" style="width:120px;font-size:1.15em;padding:0.7em 1.2em;">
+            <label for="pcd-input" style="font-size:1.15em;min-width:120px;text-align:right;">PCD (mm):</label>
+            <input type="number" id="pcd-input" placeholder="e.g. 105" style="width:160px;font-size:1.15em;padding:0.7em 1.2em;">
+        </div>
         <div id="flange-result" class="flange-finder-result"></div>
+
+        <!-- NPS/DN互查功能 -->
+        <!-- 已删除 -->
     </div>
+    <!-- 图片与说明（notes） -->
+    <div style="max-width: 700px; min-width: 420px; margin: 0 auto 2em auto; background: #f6f8fb; border-radius: 16px; box-shadow: 0 2px 8px rgba(10,61,145,0.06); padding: 2em 2em 1.2em 2em; text-align:center;">
+        <img src="flange pcd illustration.png" alt="Flange PCD Illustration" style="max-width:100%; height:auto; border-radius:12px; box-shadow:0 2px 8px rgba(10,61,145,0.08); background:#fff;">
+        <div style="margin-top:1.2em; font-size:0.98em; color:#0a3d91; opacity:0.85; line-height:1.7; font-weight:400;">
+            <b>Note:</b> This flange finder has included JIS 5K, JIS 10K, BS PN6, BS PN10, BS PN16, ANSI 150LB, ANSI 300LB,<br>
+            covering from DN15 (1/2") up to DN300 (12").
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer style="background: #0a3d91; color: #fff; padding: 2em 0; margin-top: 3em;">
+        <div style="max-width: 700px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 2em; padding: 0 2em;">
+            <!-- 左侧Logo区域 -->
+            <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 1em;">
+                <img src="access logo.png" alt="Access Logo" style="height: 80px; width: auto;">
+                <div style="font-size: 0.9em; font-weight: 600;">Access M&E Services Sdn Bhd</div>
+                <div style="font-size: 0.9em; opacity: 0.8; max-width: 200px; line-height: 1.4;">
+                    Quality Engineering Services
+                </div>
+            </div>
+            
+            <!-- 中间联系信息 -->
+            <div style="flex: 1; text-align: center; font-size: 0.95em; opacity: 0.9; line-height: 1.6;">
+                <div style="font-weight: 600; margin-bottom: 0.5em; font-size: 1.1em;">Contact Information</div>
+                <div>No.36,Jalan Mutiara Emas 5/11</div>
+                <div>Taman Mount Austin, 81100 Johor Bahru, Johor, Malaysia</div>
+                <div>Phone: +(60)7-351 3720</div>
+                <div style="margin-top: 0.5em;">https://accessmne.github.io/</div>
+            </div>
+            
+            <!-- 右侧服务信息 -->
+            <div style="flex: 0 0 auto; text-align: right; font-size: 0.9em; opacity: 0.8; line-height: 1.6; max-width: 200px;">
+                <div style="font-weight: 600; margin-bottom: 0.5em; font-size: 1.1em;">Services</div>
+                <div>Steel Piping</div>
+                <div>Non-metalic Piping Fabrication</div>
+                <div>Structure/ Platform Installation</div>
+                <div>Maintenance & Repair Services</div>
+            </div>
+        </div>
+        
+        <!-- Disclaimer -->
+        <div style="max-width: 700px; margin: 0 auto; padding: 1.5em 2em 0 2em; border-top: 1px solid rgba(255,255,255,0.2); margin-top: 1.5em;">
+            <div style="font-size: 0.9em; opacity: 0.8; text-align: center; line-height: 1.5;">
+                <strong>Disclaimer:</strong> The information provided in this flange finder is for reference purposes only. 
+                While we strive to ensure accuracy, we cannot guarantee the completeness or reliability of the data. 
+                Users should verify all specifications with official documentation before making any decisions.
+            </div>
+        </div>
+    </footer>
     <script>
+        let nominalMode = 'inch'; // inch 或 dn
         // 法兰数据
         const flangeData = [
             // JIS 5K
@@ -102,6 +187,7 @@
             {std:'JIS 5K', nominal:'2', holes:4, pcd:105},
             {std:'JIS 5K', nominal:'2.5', holes:4, pcd:130},
             {std:'JIS 5K', nominal:'3', holes:4, pcd:145},
+            {std:'JIS 5K', nominal:'3.5', holes:4, pcd:155},
             {std:'JIS 5K', nominal:'4', holes:8, pcd:165},
             {std:'JIS 5K', nominal:'5', holes:8, pcd:200},
             {std:'JIS 5K', nominal:'6', holes:8, pcd:230},
@@ -117,36 +203,51 @@
             {std:'JIS 10K', nominal:'2', holes:4, pcd:120},
             {std:'JIS 10K', nominal:'2.5', holes:4, pcd:140},
             {std:'JIS 10K', nominal:'3', holes:8, pcd:150},
+            {std:'JIS 10K', nominal:'3.5', holes:8, pcd:160},
             {std:'JIS 10K', nominal:'4', holes:8, pcd:175},
             {std:'JIS 10K', nominal:'5', holes:8, pcd:210},
             {std:'JIS 10K', nominal:'6', holes:8, pcd:240},
             {std:'JIS 10K', nominal:'8', holes:12, pcd:290},
             {std:'JIS 10K', nominal:'10', holes:12, pcd:355},
-            {std:'JIS 10K', nominal:'12', holes:12, pcd:410},
+            {std:'JIS 10K', nominal:'12', holes:12, pcd:400},
             // BS PN6
-            {std:'BS PN6', nominal:'0.5', holes:4, pcd:65},
-            {std:'BS PN6', nominal:'0.75', holes:4, pcd:75},
-            {std:'BS PN6', nominal:'1', holes:4, pcd:85},
-            {std:'BS PN6', nominal:'1.25', holes:4, pcd:100},
-            {std:'BS PN6', nominal:'1.5', holes:4, pcd:110},
-            {std:'BS PN6', nominal:'2', holes:4, pcd:125},
-            {std:'BS PN6', nominal:'2.5', holes:4, pcd:145},
-            {std:'BS PN6', nominal:'3', holes:4, pcd:160},
-            {std:'BS PN6', nominal:'4', holes:8, pcd:180},
-            {std:'BS PN6', nominal:'5', holes:8, pcd:210},
-            {std:'BS PN6', nominal:'6', holes:8, pcd:240},
-            {std:'BS PN6', nominal:'8', holes:8, pcd:295},
-            {std:'BS PN6', nominal:'10', holes:12, pcd:355},
-            {std:'BS PN6', nominal:'12', holes:12, pcd:430},
-            // 用户优先BS PN16数据
-            {std:'BS PN16', nominal:'0.375', holes:4, pcd:60},
+            {std:'BS PN6', nominal:'0.5', holes:4, pcd:55},
+            {std:'BS PN6', nominal:'0.75', holes:4, pcd:65},
+            {std:'BS PN6', nominal:'1', holes:4, pcd:75},
+            {std:'BS PN6', nominal:'1.25', holes:4, pcd:90},
+            {std:'BS PN6', nominal:'1.5', holes:4, pcd:100},
+            {std:'BS PN6', nominal:'2', holes:4, pcd:110},
+            {std:'BS PN6', nominal:'2.5', holes:4, pcd:130},
+            {std:'BS PN6', nominal:'3', holes:4, pcd:150},
+            {std:'BS PN6', nominal:'4', holes:4, pcd:170},
+            {std:'BS PN6', nominal:'5', holes:8, pcd:200},
+            {std:'BS PN6', nominal:'6', holes:8, pcd:225},
+            {std:'BS PN6', nominal:'8', holes:8, pcd:280},
+            {std:'BS PN6', nominal:'10', holes:12, pcd:335},
+            {std:'BS PN6', nominal:'12', holes:12, pcd:395},
+            // BS PN10
+            {std:'BS PN10', nominal:'0.5', holes:4, pcd:65},
+            {std:'BS PN10', nominal:'0.75', holes:4, pcd:75},
+            {std:'BS PN10', nominal:'1', holes:4, pcd:85},
+            {std:'BS PN10', nominal:'1.25', holes:4, pcd:100},
+            {std:'BS PN10', nominal:'1.5', holes:4, pcd:110},
+            {std:'BS PN10', nominal:'2', holes:4, pcd:125},
+            {std:'BS PN10', nominal:'2.5', holes:4, pcd:145},
+            {std:'BS PN10', nominal:'3', holes:8, pcd:160},
+            {std:'BS PN10', nominal:'4', holes:8, pcd:180},
+            {std:'BS PN10', nominal:'5', holes:8, pcd:210},
+            {std:'BS PN10', nominal:'6', holes:8, pcd:245},
+            {std:'BS PN10', nominal:'8', holes:8, pcd:295},
+            {std:'BS PN10', nominal:'10', holes:12, pcd:350},
+            {std:'BS PN10', nominal:'12', holes:12, pcd:400},
+            // BS PN16
             {std:'BS PN16', nominal:'0.5', holes:4, pcd:65},
             {std:'BS PN16', nominal:'0.75', holes:4, pcd:75},
             {std:'BS PN16', nominal:'1', holes:4, pcd:85},
             {std:'BS PN16', nominal:'1.25', holes:4, pcd:100},
             {std:'BS PN16', nominal:'1.5', holes:4, pcd:110},
             {std:'BS PN16', nominal:'2', holes:4, pcd:125},
-            {std:'BS PN16', nominal:'2.5', holes:8, pcd:145},
+            {std:'BS PN16', nominal:'2.5', holes:4, pcd:145},
             {std:'BS PN16', nominal:'3', holes:8, pcd:160},
             {std:'BS PN16', nominal:'4', holes:8, pcd:180},
             {std:'BS PN16', nominal:'5', holes:8, pcd:210},
@@ -154,25 +255,84 @@
             {std:'BS PN16', nominal:'8', holes:12, pcd:295},
             {std:'BS PN16', nominal:'10', holes:12, pcd:355},
             {std:'BS PN16', nominal:'12', holes:12, pcd:410},
-            {std:'BS PN16', nominal:'14', holes:16, pcd:470},
-            {std:'BS PN16', nominal:'16', holes:16, pcd:525},
-            {std:'BS PN16', nominal:'18', holes:20, pcd:585},
-            {std:'BS PN16', nominal:'20', holes:20, pcd:650},
-            {std:'BS PN16', nominal:'24', holes:20, pcd:770},
-            {std:'BS PN16', nominal:'28', holes:24, pcd:840},
-            {std:'BS PN16', nominal:'32', holes:24, pcd:950},
-            {std:'BS PN16', nominal:'36', holes:28, pcd:1050},
-            {std:'BS PN16', nominal:'40', holes:28, pcd:1170},
-            {std:'BS PN16', nominal:'48', holes:32, pcd:1390},
-            {std:'BS PN16', nominal:'56', holes:36, pcd:1590},
-            {std:'BS PN16', nominal:'64', holes:40, pcd:1820}
+             // ANSI 150lB
+            {std:'ANSI 150lB', nominal:'0.5', holes:4, pcd:60.45},
+            {std:'ANSI 150lB', nominal:'0.75', holes:4, pcd:69.85},
+            {std:'ANSI 150lB', nominal:'1', holes:4, pcd:79.25},
+            {std:'ANSI 150lB', nominal:'1.25', holes:4, pcd:88.90},
+            {std:'ANSI 150lB', nominal:'1.5', holes:4, pcd:98.55},
+            {std:'ANSI 150lB', nominal:'2', holes:4, pcd:120.65},
+            {std:'ANSI 150lB', nominal:'2.5', holes:4, pcd:139.70},
+            {std:'ANSI 150lB', nominal:'3', holes:4, pcd:152.40},
+            {std:'ANSI 150lB', nominal:'3.5', holes:8, pcd:177.80},
+            {std:'ANSI 150lB', nominal:'4', holes:8, pcd:190.50},
+            {std:'ANSI 150lB', nominal:'5', holes:8, pcd:215.90},
+            {std:'ANSI 150lB', nominal:'6', holes:8, pcd:241.30},
+            {std:'ANSI 150lB', nominal:'8', holes:8, pcd:298.45},
+            {std:'ANSI 150lB', nominal:'10', holes:12, pcd:361.95},
+            {std:'ANSI 150lB', nominal:'12', holes:12, pcd:431.80},
+
+             // ANSI 300lB
+            {std:'ANSI 300lB', nominal:'0.5', holes:4, pcd:66.55},
+            {std:'ANSI 300lB', nominal:'0.75', holes:4, pcd:82.55},
+            {std:'ANSI 300lB', nominal:'1', holes:4, pcd:88.90},
+            {std:'ANSI 300lB', nominal:'1.25', holes:4, pcd:98.55},
+            {std:'ANSI 300lB', nominal:'1.5', holes:4, pcd:114.30},
+            {std:'ANSI 300lB', nominal:'2', holes:8, pcd:127.00},
+            {std:'ANSI 300lB', nominal:'2.5', holes:8, pcd:149.35},
+            {std:'ANSI 300lB', nominal:'3', holes:8, pcd:168.15},
+            {std:'ANSI 300lB', nominal:'3.5', holes:8, pcd:184.15},
+            {std:'ANSI 300lB', nominal:'4', holes:8, pcd:200.15},
+            {std:'ANSI 300lB', nominal:'5', holes:8, pcd:234.95},
+            {std:'ANSI 300lB', nominal:'6', holes:8, pcd:269.75},
+            {std:'ANSI 300lB', nominal:'8', holes:8, pcd:330.20},
+            {std:'ANSI 300lB', nominal:'10', holes:12, pcd:387.35},
+            {std:'ANSI 300lB', nominal:'12', holes:12, pcd:450.85},
         ];
+        // NPS-DN 对照表
+        // 已删除
+        // DN与inch对照表
+        const dnInchTable = [
+            { dn: '15', inch: '0.5' },
+            { dn: '20', inch: '0.75' },
+            { dn: '25', inch: '1' },
+            { dn: '32', inch: '1.25' },
+            { dn: '40', inch: '1.5' },
+            { dn: '50', inch: '2' },
+            { dn: '65', inch: '2.5' },
+            { dn: '80', inch: '3' },
+            { dn: '90', inch: '3.5' },
+            { dn: '100', inch: '4' },
+            { dn: '125', inch: '5' },
+            { dn: '150', inch: '6' },
+            { dn: '200', inch: '8' },
+            { dn: '250', inch: '10' },
+            { dn: '300', inch: '12' }
+        ];
+        function dnToInch(dn) {
+            const found = dnInchTable.find(item => item.dn === dn);
+            return found ? found.inch : null;
+        }
+        function inchToDn(inch) {
+            const found = dnInchTable.find(item => item.inch === inch);
+            return found ? found.dn : null;
+        }
         function parseNominal(val) {
-            // 支持 1 1/2 或 1.5
             if (!val) return null;
             val = val.trim().replace('"','');
+            if (nominalMode === 'dn') {
+                // DN模式，支持 DN50 或 50，先转inch
+                val = val.toUpperCase();
+                let dn = val.startsWith('DN') ? val.slice(2) : val;
+                if (/^\d+$/.test(dn)) {
+                    let inch = dnToInch(dn);
+                    return inch ? inch : null;
+                } else {
+                    return null;
+                }
+            }
+            // inch模式，支持 2 1/2、1/2、3/4 等
             if (val.includes('/')) {
-                // 1 1/2 -> 1.5
                 const parts = val.split(' ');
                 if (parts.length === 2) {
                     const n = parseInt(parts[0]);
@@ -180,17 +340,23 @@
                     if (frac.length === 2) {
                         return (n + parseInt(frac[0])/parseInt(frac[1])).toString();
                     }
+                } else if (parts.length === 1) {
+                    // 只有分数部分，如 1/2
+                    const frac = parts[0].split('/');
+                    if (frac.length === 2) {
+                        return (parseInt(frac[0])/parseInt(frac[1])).toString();
+                    }
                 }
             }
             return parseFloat(val).toString();
         }
         function getDocLink(std) {
-            if (std.startsWith('BS PN16')) return 'flange_docs/bs_pn16_user.txt';
+            if (std.startsWith('BS PN16')) return 'flange_docs/bs_pn16.pdf';
             // 预留文档链接，后续可补充PDF
             if (std.startsWith('JIS 5K')) return 'flange_docs/jis5k.pdf';
             if (std.startsWith('JIS 10K')) return 'flange_docs/jis10k.pdf';
             if (std.startsWith('BS PN6')) return 'flange_docs/bs_pn6.pdf';
-            if (std.startsWith('BS PN25')) return 'flange_docs/bs_pn25.pdf';
+            if (std.startsWith('BS PN10')) return 'flange_docs/bs_pn10.pdf';
             if (std.startsWith('ANSI 150')) return 'flange_docs/ansi150.pdf';
             if (std.startsWith('ANSI 300')) return 'flange_docs/ansi300.pdf';
             return null;
@@ -204,21 +370,26 @@
             const nominal = parseNominal(document.getElementById('nominal-input').value);
             const holes = parseInt(document.getElementById('hole-input').value);
             const pcd = parseFloat(document.getElementById('pcd-input').value);
+            const tolerance = parseFloat(document.getElementById('pcd-tolerance').value);
             let results = [];
             if (nominal && holes && pcd) {
                 results = flangeData.filter(row => {
-                    return row.nominal === nominal && row.holes === holes && Math.abs(row.pcd - pcd) <= 10;
+                    return row.nominal === nominal && row.holes === holes && Math.abs(row.pcd - pcd) <= tolerance;
                 });
+                // 按误差升序排序
+                results.sort((a, b) => Math.abs(a.pcd - pcd) - Math.abs(b.pcd - pcd));
             }
             let html = '';
             if (results.length > 0) {
-                html += '<table class="flange-list-table"><tr><th>Copy</th><th>Standard</th><th>Nominal Size (in)</th><th>No. of Holes</th><th>PCD (mm)</th><th>Open Document</th></tr>';
+                html += '<table class="flange-list-table"><tr><th>Copy</th><th>Standard</th><th>Inch</th><th>DN</th><th>No. of Holes</th><th>PCD (mm)</th><th>Open Document</th></tr>';
                 for (const row of results) {
                     const docLink = getDocLink(row.std);
+                    const dn = inchToDn(row.nominal) ? ('DN' + inchToDn(row.nominal)) : '';
                     html += `<tr>`+
                         `<td><button class='copy-btn' onclick=\"copyToClipboard('${row.std} ${row.nominal}')\">Copy</button></td>`+
                         `<td>${row.std}</td>`+
                         `<td>${row.nominal}</td>`+
+                        `<td>${dn}</td>`+
                         `<td>${row.holes}</td>`+
                         `<td>${row.pcd}</td>`+
                         `<td>`+(docLink?`<a class='doc-link-btn' href='${docLink}' target='_blank'>Open Document</a>`:'')+`</td>`+
@@ -226,13 +397,41 @@
                 }
                 html += '</table>';
             } else if (nominal || holes || pcd) {
-                html = '<div style="color:#c00;">No matching flange found (±10mm PCD).</div>';
+                html = `<div style=\"color:#c00;\">No matching flange found (±${tolerance}mm PCD).</div>`;
             }
             document.getElementById('flange-result').innerHTML = html;
         }
+        function convertNpsDn() {}
+        function toggleNominalMode() {
+            if (nominalMode === 'inch') {
+                nominalMode = 'dn';
+                document.getElementById('toggle-dn-btn').innerText = 'current：DN';
+                document.getElementById('nominal-label').innerText = 'METRIC (DN, DN50 or 50)：';
+                document.getElementById('nominal-input').placeholder = 'DN50 or 50';
+            } else {
+                nominalMode = 'inch';
+                document.getElementById('toggle-dn-btn').innerText = 'current：INCH';
+                document.getElementById('nominal-label').innerText = 'Nominal Size (inches, e.g. 2 or 2.5):';
+                document.getElementById('nominal-input').placeholder = 'e.g. 2 or 2.5';
+            }
+            findFlanges();
+        }
+        // 初始化按钮状态
+        window.addEventListener('DOMContentLoaded', function() {
+            if (nominalMode === 'dn') {
+                document.getElementById('toggle-dn-btn').innerText = 'current：DN';
+                document.getElementById('nominal-label').innerText = 'METRIC (DN, DN50 or 50)：';
+                document.getElementById('nominal-input').placeholder = 'DN50 or 50';
+            } else {
+                document.getElementById('toggle-dn-btn').innerText = 'current：INCH';
+                document.getElementById('nominal-label').innerText = 'Nominal Size (inches, e.g. 2 or 2.5):';
+                document.getElementById('nominal-input').placeholder = 'e.g. 2 or 2.5';
+            }
+        });
         document.getElementById('nominal-input').addEventListener('input', findFlanges);
         document.getElementById('hole-input').addEventListener('input', findFlanges);
         document.getElementById('pcd-input').addEventListener('input', findFlanges);
+        document.getElementById('pcd-tolerance').addEventListener('change', findFlanges);
     </script>
 </body>
 </html>

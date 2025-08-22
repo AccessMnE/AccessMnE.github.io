@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cutting Plan Optimizer (Enhanced)</title>
+  <style>
+    /* 保持原有样式 + 打印友好 */
+    @media print {
+      body{background:white;color:black}
+      .card{box-shadow:none;border:1px solid #ccc}
+      .btn,.toolbar{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cutting Plan Optimizer (Enhanced)</h1>
+
+    <div class="grid">
+      <div class="card">
+        <div class="row">
+          <div>
+            <label>单位 Unit</label>
+            <select id="unit">
+              <option value="mm">mm（毫米）</option>
+              <option value="m">m（米）</option>
+              <option value="ft">ft（英尺）</option>
+              <option value="ft_in">ft+in（英尺+英寸）</option>
+            </select>
+          </div>
+          <div>
+            <label>优化目标</label>
+            <select id="optType">
+              <option value="util">最大利用率（最小废料）</option>
+              <option value="minStocks">最少用条数</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>标准料长度 a</label>
+            <input id="stock" type="text" placeholder="如 6 或 20ft 6in" />
+          </div>
+          <div>
+            <label>锯缝 kerf</label>
+            <input id="kerf" type="text" placeholder="如 3mm 或 0.125in" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>尾料最小可用长度</label>
+            <input id="minRem" type="text" placeholder="小于此长度视为废料" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label>需求件（长度 & 数量）</label>
+          <table class="table" id="partsTbl">
+            <thead>
+              <tr><th>#</th><th>长度</th><th>数量</th><th></th></tr>
+            </thead>
+            <tbody id="partsBody"></tbody>
+          </table>
+          <div class="toolbar">
+            <button class="btn" id="addRow">+ 添加一行</button>
+            <button class="btn" id="loadDemo">载入示例</button>
+            <button class="btn" id="importCsv">从 CSV 导入</button>
+            <button class="btn primary" id="run">计算 Cutting Plan</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="stats"></div>
+        <div id="plan"></div>
+        <div class="toolbar">
+          <button class="btn" id="exportCsv">导出 CSV</button>
+          <button class="btn" id="copyText">复制文本方案</button>
+          <button class="btn" id="printPlan">打印 / 导出 PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const $ = (s)=>document.querySelector(s);
+  const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+  function parseLength(str, unitSel){
+    str = (str||'').trim();
+    if(!str) return NaN;
+    const mmPerUnit = {mm:1,m:1000,ft:304.8,in:25.4};
+    if(unitSel==='ft_in'){
+      // 支持格式: 6ft 2in 或 6'2" 或 74in
+      let ft=0,inches=0;
+      const ftMatch = str.match(/(\d+(?:\.\d+)?)\s*ft/);
+      if(ftMatch) ft=parseFloat(ftMatch[1]);
+      const inMatch = str.match(/(\d+(?:\.\d+)?)\s*in/);
+      if(inMatch) inches=parseFloat(inMatch[1]);
+      if(!ftMatch && !inMatch){
+        if(str.includes("'")){
+          const [f,i] = str.split("'");
+          ft=parseFloat(f||0);
+          inches=parseFloat(i||0);
+        }else if(str.endsWith('in')){
+          inches=parseFloat(str);
+        }
+      }
+      return ft*304.8 + inches*25.4;
+    }
+    // fallback: parse number * unit
+    const val = parseFloat(str);
+    if(isNaN(val)) return NaN;
+    return val * mmPerUnit[unitSel];
+  }
+
+  function readInputs(){
+    const unitSel=$('#unit').value;
+    const stock = parseLength($('#stock').value, unitSel);
+    if(!stock) throw new Error('请输入有效标准长度');
+    const kerf = parseLength($('#kerf').value, unitSel)||0;
+    const minRem = parseLength($('#minRem').value, unitSel)||0;
+    const rows = $$('#partsBody tr');
+    const demands=[];
+    rows.forEach((tr,i)=>{
+      const L=parseLength(tr.querySelector('.len').value, unitSel);
+      const qty=parseInt(tr.querySelector('.qty').value,10);
+      if(L>0 && qty>0){
+        for(let k=1;k<=qty;k++) demands.push({part:i+1,piece:k,L});
+      }
+    });
+    if(!demands.length) throw new Error('请输入需求件');
+    return {unitSel,stock,kerf,minRem,demands,opt:$('#optType').value};
+  }
+
+  function computePlan(params){
+    let {stock,kerf,minRem,demands,opt}=params;
+    demands.sort((a,b)=>b.L-a.L);
+    const bars=[];
+    function place(item){
+      let best=-1,bestLeft=Infinity;
+      if(opt==='util'){
+        // best fit
+        for(let i=0;i<bars.length;i++){
+          const need=item.L+(bars[i].segs.length?kerf:0);
+          const left=bars[i].left-need;
+          if(left>=0 && left<bestLeft){best=i;bestLeft=left;}
+        }
+      }else{
+        // minStocks: first fit
+        for(let i=0;i<bars.length;i++){
+          const need=item.L+(bars[i].segs.length?kerf:0);
+          if(bars[i].left>=need){best=i;break;}
+        }
+      }
+      if(best>=0){
+        const bar=bars[best];
+        if(bar.segs.length) bar.used+=kerf;
+        bar.segs.push(item);
+        bar.used+=item.L;
+        bar.left=stock-bar.used;
+      }else{
+        const bar={segs:[],used:0,left:stock};
+        bar.segs.push(item);
+        bar.used+=item.L;
+        bar.left=stock-bar.used;
+        bars.push(bar);
+      }
+    }
+    demands.forEach(place);
+    return {bars};
+  }
+
+  function render(result){
+    $('#stats').innerHTML='总条数: '+result.bars.length;
+    $('#plan').innerHTML=result.bars.map((b,i)=>{
+      return `<div>第${i+1}条: `+b.segs.map(s=>`#${s.part}.${s.piece}(${s.L.toFixed(1)}mm)`).join(' + ')+` | 余 ${b.left.toFixed(1)}mm</div>`;
+    }).join('');
+  }
+
+  $('#addRow').addEventListener('click',()=>{
+    const idx=$$('#partsBody tr').length+1;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${idx}</td><td><input class="len"/></td><td><input class="qty"/></td><td><button data-del>x</button></td>`;
+    $('#partsBody').appendChild(tr);
+  });
+  $('#partsBody').addEventListener('click',e=>{if(e.target.dataset.del)e.target.closest('tr').remove();});
+  $('#run').addEventListener('click',()=>{try{const p=readInputs();const r=computePlan(p);render(r);window.__last={p,r};}catch(e){alert(e.message)}});
+  $('#importCsv').addEventListener('click',()=>{
+    const inp=document.createElement('input');inp.type='file';inp.accept='.csv';
+    inp.onchange=(e)=>{
+      const f=e.target.files[0];
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const lines=reader.result.split(/\n/);
+        $('#partsBody').innerHTML='';
+        lines.forEach((l,i)=>{
+          const [len,qty]=l.split(',');
+          if(len&&qty){
+            const tr=document.createElement('tr');
+            tr.innerHTML=`<td>${i+1}</td><td><input class="len" value="${len}"/></td><td><input class="qty" value="${qty}"/></td><td><button data-del>x</button></td>`;
+            $('#partsBody').appendChild(tr);
+          }
+        });
+      };
+      reader.readAsText(f);
+    };
+    inp.click();
+  });
+  $('#exportCsv').addEventListener('click',()=>{
+    if(!window.__last) return;
+    const {p,r}=window.__last;
+    let out='Bar,Part,Piece,Length(mm),Left(mm)\n';
+    r.bars.forEach((b,i)=>{
+      b.segs.forEach(s=>out+=`${i+1},${s.part},${s.piece},${s.L},,\n`);
+      out+=`${i+1},,,,${b.left}\n`;
+    });
+    const blob=new Blob([out],{type:'text/csv'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='plan.csv';a.click();
+  });
+  $('#copyText').addEventListener('click',()=>{
+    if(!window.__last) return;
+    const {r}=window.__last;
+    const txt=r.bars.map((b,i)=>`第${i+1}条: `+b.segs.map(s=>`#${s.part}.${s.piece}(${s.L})`).join(' + ')+` | 余${b.left}`).join('\n');
+    navigator.clipboard.writeText(txt);
+  });
+  $('#printPlan').addEventListener('click',()=>window.print());
+
+  // demo
+  $('#loadDemo').addEventListener('click',()=>{
+    $('#unit').value='m';$('#stock').value='6';$('#kerf').value='0.003';$('#minRem').value='0.15';
+    $('#partsBody').innerHTML='';
+    [[2.3,2],[1.7,4],[1.2,3],[0.8,2]].forEach(([L,Q],i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${i+1}</td><td><input class="len" value="${L}"/></td><td><input class="qty" value="${Q}"/></td><td><button data-del>x</button></td>`;
+      $('#partsBody').appendChild(tr);
+    });
+  });
+  $('#addRow').click();
+</script>
+</body>
+</html>
