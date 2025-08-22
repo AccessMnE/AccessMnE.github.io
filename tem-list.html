@@ -5,11 +5,716 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TEM list</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body { margin: 0; }
+        .page { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; border-right: 1px solid #eee; padding: 12px; box-sizing: border-box; }
+        .content { flex: 1; padding: 12px; box-sizing: border-box; }
+        .columns { display: flex; gap: 12px; align-items: flex-start; }
+        .column { flex: 1; min-width: 0; }
+        .column h3 { margin: 0 0 8px; font-size: 14px; color: #333; }
+        #consumablesSection { background: #e6f4ff; border: 1px solid #c7ddff; border-radius: 8px; padding: 8px; }
+        .group-block { margin: 14px 0; }
+        .group-title { margin: 0 0 6px; font-size: 12px; color: #0a3d91; font-weight: 700; letter-spacing: .2px; }
+        .group-sep { display: none; }
+        .cart { width: 300px; border-left: 1px solid #eee; padding: 12px; box-sizing: border-box; }
+        .section-title { margin: 10px 0 6px; font-weight: 600; }
+        .menu { list-style: none; padding: 0; margin: 0; }
+        .menu > li { margin-bottom: 6px; }
+        .menu-button { width: 100%; text-align: left; padding: 8px 10px; border: 1px solid #ddd; background: #fafafa; border-radius: 6px; cursor: pointer; color: #222 !important; }
+        .menu-button.active { background: #e6f4ff; border-color: #1677ff; }
+        .submenu { list-style: none; padding-left: 10px; margin: 6px 0 0; }
+        .submenu .menu-button { background: #fff; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 6px; cursor: pointer; background: #fff; display: flex; align-items: center; gap: 8px; }
+        .card:hover { border-color: #1677ff; box-shadow: 0 1px 0 rgba(0,0,0,0.04); }
+        .card-title { font-weight: 600; margin: 0; }
+        .card.selected { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.15) inset; }
+        .thumb { width: 56px; height: 56px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex: 0 0 auto; }
+        .thumb img { width: 100%; height: 100%; object-fit: contain; }
+        .muted { color: #888; font-size: 12px; }
+        .cart-title { margin: 0 0 10px; }
+        .cart-list { list-style: none; padding: 0; margin: 0; }
+        .cart-item { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 6px 0; }
+        .qty { display: inline-flex; align-items: center; gap: 6px; }
+        .qty button { width: 22px; height: 22px; line-height: 20px; text-align: center; }
+        .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .tag { display: inline-block; padding: 2px 6px; border-radius: 999px; border: 1px solid #eee; font-size: 12px; background: #fafafa; }
+        .empty { color: #666; padding: 20px; border: 1px dashed #ddd; border-radius: 8px; text-align: center; }
+    </style>
 </head>
 <body>
-    <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
-    <!-- Main content -->
-    <h1>TEM List</h1>
-    <p>This is the TEM List page.</p>
+    <h1 style="padding: 12px; margin: 0;">TEM List</h1>
+    <div class="page">
+        <aside class="sidebar">
+            <div class="section-title">一级分类</div>
+            <ul class="menu" id="level1Menu">
+                <li><button class="menu-button" data-cat="power tools">power tools</button></li>
+                <li>
+                    <button class="menu-button" data-cat="welding">welding</button>
+                    <ul class="submenu" data-parent="welding">
+                        <li><button class="menu-button" data-cat="welding" data-subcat="SMAW">SMAW</button></li>
+                        <li><button class="menu-button" data-cat="welding" data-subcat="GMAW">GMAW</button></li>
+                        <li><button class="menu-button" data-cat="welding" data-subcat="GTAW">GTAW</button></li>
+                    </ul>
+                </li>
+                <li><button class="menu-button" data-cat="frp">frp</button></li>
+                <li><button class="menu-button" data-cat="hand tools">hand tools</button></li>
+                <li><button class="menu-button" data-cat="consumables">consumables</button></li>
+                <li><button class="menu-button" data-cat="electrical">electrical</button></li>
+                <li>
+                    <button class="menu-button" data-cat="safety">safety</button>
+                    <ul class="submenu" data-parent="safety">
+                        <li><button class="menu-button" data-cat="safety" data-subcat="WAH">WAH</button></li>
+                        <li><button class="menu-button" data-cat="safety" data-subcat="HOTWORK">HOTWORK</button></li>
+                        <li><button class="menu-button" data-cat="safety" data-subcat="LIFTING">LIFTING</button></li>
+                        <li><button class="menu-button" data-cat="safety" data-subcat="CONFINED SPACE">CONFINED SPACE</button></li>
+                        <li><button class="menu-button" data-cat="safety" data-subcat="GENERALS">GENERALS</button></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="toolbar">
+                <span class="tag" id="activePath">power tools</span>
+                <span class="muted">单个 item 你可以替换为实际名称；双击即可下单。</span>
+            </div>
+            <div class="columns">
+                <section class="column">
+                    <h3>tools and equipment</h3>
+                    <div id="toolsGrid" class="grid"></div>
+                    <div id="toolsEmpty" class="empty" style="display:none;">该分类暂无物品，请添加或替换占位项。</div>
+                </section>
+                <section class="column" id="consumablesSection">
+                    <h3>consumable</h3>
+                    <div id="consumablesGrid" class="grid"></div>
+                    <div id="consumablesEmpty" class="empty" style="display:none;">暂无耗材。</div>
+                </section>
+            </div>
+        </main>
+
+        <aside class="cart">
+            <h3 class="cart-title">小提示</h3>
+            <div class="muted">可多选物品，支持推荐高亮；完成后右侧主区域可打印清单。</div>
+            <div id="cartEmpty" class="empty" style="margin-top:10px;">订单为空，双击左侧物品加入。</div>
+            <ul id="cartList" class="cart-list"></ul>
+            <div class="toolbar" style="margin-top:10px;">
+                <button id="printBtn" type="button">打印订单</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- recommend 配置区（不显示在页面）。
+         编辑格式：每行一个映射，左侧为工具名称，右侧为逗号分隔的耗材列表。
+         示例：
+         angle grinder 4": cutting disc, grinding disc
+         oxy cutter: oxygen cylinder, acetylene cylinder, dual cylinder trolley
+    -->
+    <section id="recommendSection" style="display:none;">
+        <pre id="recommendData">
+angle grinder 4": cutting disc, grinding disc, polishing wheel wool, polishing wheel nylon, sanding disc, flap disc
+
+oxy cutter: oxygen cylinder, acetylene cylinder, dual cylinder trolley
+
+pencil grinder: Carbide bit,Mounted stone,flap wheel (300#)
+
+jig saw: jig saw blade (wood/metal)
+
+Magnetic drill, Impact drill, cordless drill, Rotary hammer: drill bit (_mm) (ss/steel/wood),rotary hammer bit (_mm),
+
+counter sunk bit (25mm),hole saw (_mm),magnetic drill bit(_mm)
+
+Pneumatic wrench: box socket,box socket adapter
+
+Puncher: puncher die(_mm)
+
+SMAW welding machine: MS Electrode RB26 (2.6/3.2),MS Electrode LB-52-18 (2.6/3.2),SS Electrode 308L (2.6/3.2),
+SS Electrode 316 (2.6/3.2),SS-other Electrode 309L (2.6/3.2)
+
+MIG welding machine:MS Wire ER70S CO2 (0.8),SS Wire 308 (0.8),Al Wire MC5356m (0.8),CO2 cylinder
+
+TIG welding machine:SS filler rod 308 (2.4/3.2),SS filler rod 316 (1.2/1.6/2.4),Argon cylinder,N2 cylinder (purging),
+Aluminium tape,Sponge,Acid pickling paste,Steel wire brush,used cloth,paint brush (small),stainless steel wax (blue)
+
+Roller handle (4"/7"):paint roller refill(4"/7")
+
+
+        </pre>
+    </section>
+    <!-- 耗材分组配置（隐藏）。格式：组名: 关键字1, 关键字2 -->
+    <section id="consumableGroupsSection" style="display:none;">
+        <pre id="consumableGroups">
+# Grinding & Cutting
+Grinding & Cutting: grinding, cutting, flap, sanding, polishing
+# Oxy-Fuel
+Oxy-Fuel: oxygen, acetylene, trolley
+# Drilling
+Drilling: drill bit, rotary hammer bit, hole saw, counter sunk, magnetic drill bit
+# Wrench & Socket
+Wrench & Socket: socket
+# TIG/MIG/SMAW
+SMAW: electrode
+MIG: er70s, wire, co2
+TIG: tungsten, filler rod, argon
+# Painting & Finishing
+Painting & Finishing: paint, thinner, roller, brush, tape, wax
+# Cleaning & Misc
+Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, sealing, duct, string, gum
+        </pre>
+    </section>
+
+    <script>
+    // 数据结构：一级分类与（可选）二级分类。占位 item 可自行替换。
+    const catalog = {
+        'power tools': {
+            items: [
+                'angle grinder 4"',
+                'angle grinder 7"',
+                'rotary hammer',
+                'pencil grinder',
+                'jigsaw',
+                'oxy cutter',
+                'portable air compressor',
+                'magnetic drill',
+                'diamond/ marble cutter',
+                'impact drill',
+                'electrofusion machine',
+                'pneumatic wrench',
+                'hot air blower',
+                'hot plate welding machine',
+                'socket welding machine',
+                'demolition hammer',
+                'puncher',
+                'tool box(big)',
+                'tool box welder/foreman',
+                'submersible pump'
+            ]
+        },
+        'welding': {
+            sub: {
+                'SMAW': ['SMAW Welding Machine', 'Ground clamp','Electrode holder'],
+                'GMAW': ['MIG Welding Machine', 'MIG torch','flow meter','regulator','ground clamp'],
+                'GTAW': ['TIG Welding Machine','TIG Torch', 'flow meter','regulator','Tungsten', 'ground clamp']
+            }
+        },
+        'frp': {
+            items: ['FRP Mat', 'Resin', 'Hardener']
+        },
+        'hand tools': {
+            items: ['Pipe stand', 'G-clamp','Pipe wrench/gastong', 'roller handle(4"/7")',
+            'painting tray','telescopic pole (5m)','Ring spanner (_mm)',
+            'adjustable spanner','Plier','union spanner','file','Allen key set','hammer','hand saw','pipe cutter',
+            'copper cutter','Screwdriver Set']
+        },
+        'consumables': {
+            items: [
+                //angle grinder
+                'cutting disc',
+                'grinding disc',
+                'flap disc',
+                'sanding disc',
+                'polishing wheel wool',
+                'polishing wheel nylon',
+                //oxy cutter
+                'oxygen cylinder', 'acetylene cylinder', 'dual cylinder trolley',
+                //pencil grinder
+                'Carbide bit','Mounted stone','flap wheel (300#)',
+                //jig saw
+                'jig saw blade (wood/metal)',
+                //drilling
+                'drill bit (_mm) (ss/steel/wood)','rotary hammer bit (_mm)',
+                'counter sunk bit (25mm)','hole saw (_mm)','magnetic drill bit(_mm)',
+                //wrench
+                'box socket','box socket adapter',
+                //puncher
+                'puncher die(_mm)',
+                //SMAW
+                'MS Electrode RB26 (2.6/3.2)',
+                'MS Electrode LB-52-18 (2.6/3.2)',
+                'SS Electrode 308L (2.6/3.2)',
+                'SS Electrode 316 (2.6/3.2)',
+                'SS-other Electrode 309L (2.6/3.2)',
+                //MIG
+                'MS Wire ER70S CO2 (0.8)',
+                'SS Wire 308 (0.8)',
+                'Al Wire MC5356m (0.8)',
+                'CO2 cylinder',
+                //TIG
+                'SS filler rod 308 (2.4/3.2)',
+                'SS filler rod 316 (1.2/1.6/2.4)',
+                'Argon cylinder',
+                'N2 cylinder (purging)',
+                'Aluminium tape',
+                'Sponge',
+                'Acid pickling paste',
+                'Steel wire brush',
+                'used cloth',
+                'paint brush (small)',
+                'stainless steel wax (blue)',
+                //Painting
+                'paint roller refill(4"/7")',
+                //Other
+                'Sandpaper (_#)',
+                'thinner',
+                'Paint (color=__)',
+                'Scouring pad',
+                'Canvas',
+                'Wrapping sheet',
+                'Rubbish bag',
+                'Gunny bag',
+                'Sealing tape (teflon)',
+                'Duct tape',
+                'Pipe thread string',
+                'Gum (PVC/ABS)'
+
+            ]
+        },
+        'electrical': {
+            items: ['Extension wire (3pin 13A)','Extension wire (industrial IP44/67 X 16A/32A)',
+            'Extension wire (industrial 4pin)',
+            'Y-socket',
+            'ELCB','Portable Gen-set','DB box',
+             'Insulation Tape/ Wire tape', 'Cable Lug']
+        },
+        'safety': {
+            sub: {
+                'WAH': ['scaffolding','A frame staging','metal deck','ladder(7/9steps)','long ladder',
+                'Full Body Harness', 'lifeline (wire rope)','wire rope clip','turn buckle','body harness'],
+                'HOTWORK': ['Fire extinguisher','Fire Blanket', 'Spark Shield'],
+                'LIFTING': ['Shackle', 'Chain block','Lever block/lala','lifting belt(1/3MTx_mtr)','pp rope'],
+                'CONFINED SPACE': ['blower fan c/w tubing','spot light(LED/Head)',
+                'Gas respirator','Tripod', 'Gas Detector'],
+                'GENERALS': ['Safety Helmet', 'Safety Glasses','Safety shoes','Rain shoes',
+                    'Jacket', 'Reflective safety jacket','Welding shield','Welding screen (cermin)',
+                    'Glove(cotton/fitter/welder/latex/nitrile)','safety googles','ear plug','face mask(N95/normal)',
+                    'Barricade tape','Safety cone'
+                ]
+            }
+        }
+    };
+
+    // 状态
+    let activeCategory = 'power tools';
+    let activeSubcategory = null; // 仅对带二级分类的类别有效
+    const cart = new Map(); // key: item name, value: qty
+    let selectedToolName = null; // 当前选中的工具卡片名称（用于 recommend 联动）
+    const recommendMap = new Map(); // 规范化工具名 -> [耗材...]
+    let consumableGroups = []; // [{ name, keywords[] }]
+
+    // 渲染当前路径与物品
+    function renderPath() {
+        const pathRaw = activeSubcategory ? `${activeCategory} / ${activeSubcategory}` : activeCategory;
+        document.getElementById('activePath').textContent = formatDisplayName(pathRaw);
+    }
+
+    // 侧边栏标签显示规范化（不改数据，只改显示）
+    function formatSidebarLabels() {
+        const buttons = document.querySelectorAll('.menu-button');
+        buttons.forEach(btn => {
+            const original = btn.textContent || '';
+            btn.textContent = formatDisplayName(original);
+        });
+    }
+
+    function clearGrid(gridId, emptyId) {
+        const grid = document.getElementById(gridId);
+        const empty = document.getElementById(emptyId);
+        if (grid) grid.innerHTML = '';
+        if (empty) empty.style.display = 'none';
+    }
+
+    function fillGrid(items, gridId, emptyId) {
+        const grid = document.getElementById(gridId);
+        const empty = document.getElementById(emptyId);
+        if (!grid || !empty) return;
+        grid.innerHTML = '';
+        if (!items.length) {
+            empty.style.display = 'block';
+            return;
+        }
+        items.forEach(entry => {
+            const name = (typeof entry === 'string') ? entry : entry.name;
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.setAttribute('data-item', name);
+            card.innerHTML = `
+                <div class="thumb"><img alt="${name}" /></div>
+                <div class="card-title">${formatDisplayName(name)}</div>
+            `;
+            card.addEventListener('dblclick', () => addToCart(name));
+            grid.appendChild(card);
+
+            // 加载缩略图
+            const img = card.querySelector('img');
+            const base = `tem-images/${toImageBase(name)}`;
+            tryLoadImage(img, base).catch(() => {
+                const thumb = card.querySelector('.thumb');
+                if (thumb) thumb.style.display = 'none';
+            });
+        });
+    }
+
+    function normalizeName(name) {
+        return String(name).trim().toLowerCase();
+    }
+
+    function parseRecommend() {
+        recommendMap.clear();
+        const src = document.getElementById('recommendData');
+        if (!src) return;
+        const text = src.textContent || '';
+        const lines = text.split(/\r?\n/);
+        lines.forEach(line => {
+            const l = line.trim();
+            if (!l || l.startsWith('#')) return;
+            const idx = l.indexOf(':');
+            if (idx === -1) return;
+            const key = normalizeName(l.slice(0, idx));
+            const rest = l.slice(idx + 1);
+            const items = rest.split(',').map(s => s.trim()).filter(Boolean);
+            if (key && items.length) recommendMap.set(key, items);
+        });
+    }
+
+    // 解析耗材分组配置
+    function parseConsumableGroups() {
+        consumableGroups = [];
+        const node = document.getElementById('consumableGroups');
+        if (!node) return;
+        const text = node.textContent || '';
+        const lines = text.split(/\r?\n/);
+        lines.forEach(line => {
+            const l = line.trim();
+            if (!l || l.startsWith('#')) return;
+            const idx = l.indexOf(':');
+            if (idx === -1) return;
+            const groupName = l.slice(0, idx).trim();
+            const keywords = l.slice(idx + 1).split(',').map(s => s.trim()).filter(Boolean);
+            if (groupName && keywords.length) {
+                consumableGroups.push({ name: groupName, keywords: keywords.map(k => k.toLowerCase()) });
+            }
+        });
+    }
+
+    function renderItems() {
+        clearGrid('toolsGrid', 'toolsEmpty');
+        clearGrid('consumablesGrid', 'consumablesEmpty');
+
+        let items = [];
+        const node = catalog[activeCategory];
+        if (!node) { const e = document.getElementById('toolsEmpty'); if (e) e.style.display = 'block'; return; }
+        if (node.sub) {
+            if (!activeSubcategory) {
+                const e = document.getElementById('toolsEmpty');
+                if (e) { e.style.display = 'block'; e.textContent = '请选择二级分类以查看物品'; }
+                return;
+            }
+            items = node.sub[activeSubcategory] || [];
+        } else {
+            items = node.items || [];
+        }
+
+        // 左列填充：普通分类为平铺；consumables 分类为分组展示
+        if (activeCategory === 'consumables' || activeCategory === 'consumable') {
+            if (!items.length) {
+                const e = document.getElementById('toolsEmpty');
+                if (e) { e.style.display = 'block'; e.textContent = '暂无耗材。'; }
+            } else {
+                renderGroupedConsumables(items, 'toolsGrid');
+            }
+        } else {
+            fillGrid(items, 'toolsGrid', 'toolsEmpty');
+        }
+
+        // 工具卡片绑定“单击=选择，双击=下单”
+        const toolsGrid = document.getElementById('toolsGrid');
+        if (toolsGrid) {
+            const cards = toolsGrid.querySelectorAll('.card');
+            cards.forEach(card => {
+                const name = card.getAttribute('data-item') || '';
+                card.addEventListener('click', () => {
+                    selectedToolName = name;
+                    // 高亮
+                    cards.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    // 重新渲染右侧推荐
+                    renderConsumables();
+                });
+            });
+        }
+
+        // 右列填充（当左侧为 consumable(s) 分类时显示合并池；否则仅当有推荐时显示）
+        renderConsumables(node);
+    }
+
+    function getConsumablesPool() {
+        const a = (catalog['consumables'] && Array.isArray(catalog['consumables'].items)) ? catalog['consumables'].items : [];
+        const b = (catalog['consumable'] && Array.isArray(catalog['consumable'].items)) ? catalog['consumable'].items : [];
+        // 合并去重
+        return Array.from(new Set([...(a || []), ...(b || [])]));
+    }
+
+    function renderConsumables(currentNode) {
+        const gridId = 'consumablesGrid';
+        const emptyId = 'consumablesEmpty';
+        const grid = document.getElementById(gridId);
+        const empty = document.getElementById(emptyId);
+        const section = grid ? grid.parentElement : null;
+
+        if (grid) grid.innerHTML = '';
+        if (empty) empty.style.display = 'none';
+        if (section) section.style.display = '';
+
+        // 若当前处于 consumables/consumable 分类，永久隐藏右列，避免重复
+        if (activeCategory === 'consumables' || activeCategory === 'consumable') {
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        let list = [];
+
+        if (selectedToolName) {
+            const key = normalizeName(selectedToolName);
+            const mapped = recommendMap.get(key);
+            if (Array.isArray(mapped) && mapped.length) {
+                // 若存在合并池，可在此对 mapped 进行过滤；当前直接展示 mapped
+                list = mapped;
+            }
+        }
+
+        if (!list.length) {
+            // 无推荐则隐藏整个右列区域
+            if (section) section.style.display = 'none';
+            return;
+        }
+        // 分组显示
+        renderGroupedConsumables(list, gridId);
+    }
+
+    function renderGroupedConsumables(items, gridId) {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        grid.innerHTML = '';
+        const lower = (s) => String(s).toLowerCase();
+
+        // 构建分组：按配置关键字匹配（包含关系），未匹配归入 Others
+        const groups = consumableGroups.map(g => ({ name: g.name, items: [] }));
+        const others = { name: 'Others', items: [] };
+
+        items.forEach(item => {
+            const name = (typeof item === 'string') ? item : item.name;
+            const lname = lower(name);
+            let placed = false;
+            for (const g of consumableGroups) {
+                if (g.keywords.some(kw => lname.includes(kw))) {
+                    const target = groups.find(x => x.name === g.name);
+                    if (target) target.items.push(name);
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) others.items.push(name);
+        });
+
+        const toSection = (group) => {
+            if (!group.items.length) return;
+            const block = document.createElement('section');
+            block.className = 'group-block';
+            const title = document.createElement('div');
+            title.className = 'group-title';
+            title.textContent = group.name;
+            const inner = document.createElement('div');
+            inner.className = 'grid';
+            block.appendChild(title);
+            block.appendChild(inner);
+            grid.appendChild(block);
+
+            group.items.forEach(name => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-item', name);
+                card.innerHTML = `
+                    <div class="thumb"><img alt="${name}" /></div>
+                    <div class="card-title">${formatDisplayName(name)}</div>
+                `;
+                card.addEventListener('dblclick', () => addToCart(name));
+                inner.appendChild(card);
+
+                // 缩略图
+                const img = card.querySelector('img');
+                const base = `tem-images/${toImageBase(name)}`;
+                tryLoadImage(img, base).catch(() => {
+                    const thumb = card.querySelector('.thumb');
+                    if (thumb) thumb.style.display = 'none';
+                });
+            });
+        };
+
+        groups.forEach(toSection);
+        toSection(others);
+        // 无需分割线，按块显示
+    }
+
+    // 侧边菜单点击
+    function setupMenu() {
+        const buttons = document.querySelectorAll('.menu-button');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const cat = btn.getAttribute('data-cat');
+                const sub = btn.getAttribute('data-subcat');
+                activeCategory = cat;
+                activeSubcategory = sub || null;
+                // 切换分类时清空选择并隐藏右列
+                selectedToolName = null;
+
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderPath();
+                renderItems();
+            });
+        });
+
+        // 默认选中 power tools
+        const defaultBtn = document.querySelector('.menu-button[data-cat="power tools"]');
+        if (defaultBtn) defaultBtn.classList.add('active');
+    }
+
+    // 购物车逻辑
+    function addToCart(name) {
+        const current = cart.get(name) || 0;
+        cart.set(name, current + 1);
+        renderCart();
+    }
+    function inc(name) { cart.set(name, (cart.get(name) || 1) + 1); renderCart(); }
+    function dec(name) {
+        const q = (cart.get(name) || 1) - 1;
+        if (q <= 0) cart.delete(name); else cart.set(name, q);
+        renderCart();
+    }
+    function removeItem(name) { cart.delete(name); renderCart(); }
+
+    function renderCart() {
+        const list = document.getElementById('cartList');
+        const empty = document.getElementById('cartEmpty');
+        list.innerHTML = '';
+        if (cart.size === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        cart.forEach((qty, name) => {
+            const li = document.createElement('li');
+            li.className = 'cart-item';
+            li.innerHTML = `
+                <span>${name}</span>
+                <span class="qty">
+                    <button type="button" data-action="dec" aria-label="decrease">-</button>
+                    <strong>${qty}</strong>
+                    <button type="button" data-action="inc" aria-label="increase">+</button>
+                    <button type="button" data-action="remove" aria-label="remove">x</button>
+                </span>
+            `;
+            const decBtn = li.querySelector('button[data-action="dec"]');
+            const incBtn = li.querySelector('button[data-action="inc"]');
+            const removeBtn = li.querySelector('button[data-action="remove"]');
+            if (decBtn) decBtn.addEventListener('click', () => dec(name));
+            if (incBtn) incBtn.addEventListener('click', () => inc(name));
+            if (removeBtn) removeBtn.addEventListener('click', () => removeItem(name));
+            list.appendChild(li);
+        });
+    }
+
+    // 打印订单
+    function printCart() {
+        if (cart.size === 0) {
+            alert('订单为空');
+            return;
+        }
+        let rows = '';
+        let index = 1;
+        cart.forEach((qty, name) => {
+            rows += `<tr><td>${index++}</td><td>${name}</td><td>${qty}</td></tr>`;
+        });
+        const time = new Date().toLocaleString();
+        const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>订单打印</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;padding:20px}
+h2{margin:0 0 10px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #333;padding:6px 8px;text-align:left}
+.muted{color:#666;margin-bottom:10px}
+@media print{button{display:none}}
+</style>
+</head>
+<body>
+<h2>TEM 订单</h2>
+<div class="muted">打印时间：${time}</div>
+<table>
+<thead><tr><th>#</th><th>Item</th><th>Qty</th></tr></thead>
+<tbody>${rows}</tbody>
+</table>
+<button onclick="window.print()">打印</button>
+</body></html>`;
+        const win = window.open('', '_blank');
+        if (!win) { alert('请允许弹出窗口以打印'); return; }
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+        win.focus();
+    }
+
+    function tryLoadImage(imgEl, baseUrl) {
+        return new Promise((resolve, reject) => {
+            const urlJpg = `${baseUrl}.jpg`;
+            const urlPng = `${baseUrl}.png`;
+            function onErrorFirst() {
+                imgEl.onerror = () => { reject(new Error('not found')); };
+                imgEl.onload = () => resolve(urlPng);
+                imgEl.src = urlPng;
+            }
+            imgEl.onerror = onErrorFirst;
+            imgEl.onload = () => resolve(urlJpg);
+            imgEl.src = urlJpg;
+        });
+    }
+
+    function toImageBase(name) {
+        return String(name)
+            .toLowerCase()
+            .replace(/\s+/g, '-')            // 空白转连字符
+            .replace(/["<>:\\|?*]/g, '')    // 去除非法字符
+            .replace(/[\\\/]+/g, '-')       // 斜杠与反斜杠转连字符
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+    function formatDisplayName(name) {
+        // 缩写保持全大写（长度>=2且全字母），其他词语首字母大写
+        return String(name).split(/(\s|\/|\-|\(|\)|,)/g).map(tok => {
+            if (!tok) return tok;
+            // 分隔符直接返回
+            if (/^(\s|\/|\-|\(|\)|,)$/.test(tok)) return tok;
+            // 已全大写且长度>=2：认为是缩写
+            if (/^[A-Z]{2,}$/.test(tok)) return tok;
+            // 其他：首字母大写，其余小写（保留内含数字/符号）
+            const first = tok.charAt(0).toUpperCase();
+            const rest = tok.slice(1).toLowerCase();
+            return first + rest;
+        }).join('');
+    }
+
+
+    // 初始化
+    parseRecommend();
+    parseConsumableGroups();
+    setupMenu();
+    formatSidebarLabels();
+    renderPath();
+    renderItems();
+    renderCart();
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) printBtn.addEventListener('click', printCart);
+    </script>
 </body>
 </html>
