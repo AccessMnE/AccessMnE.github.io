@@ -39,8 +39,16 @@
         <h2>OD Identifier</h2>
         <label for="od-input">Enter OD (mm):</label><br>
         <input type="number" id="od-input" placeholder="e.g. 114.3">
+        <br>
+        <label for="material-select" style="display:block; margin-top:0.5em;">Material:</label>
+        <select id="material-select" style="font-size:1.1em; padding:0.45em 0.8em; border-radius:8px; border:1px solid #0a3d91; width: 70%;">
+            <option value="hdpe">Plastic (HDPE)</option>
+            <option value="steel">Steel</option>
+        </select>
         <div id="od-result" class="od-identifier-result"></div>
+        <div id="pn-options" style="margin-top:0.6em;"></div>
     </div>
+    <div id="pn-detail" style="display:none; max-width:560px; margin:0 auto; background:#fff; border:1px solid #cfe0fb; border-radius:12px; padding:1em 1.2em; box-shadow:0 2px 8px rgba(10,61,145,0.08);"></div>
     <p>Below are related documents for Pipe OD. Click to view or download:</p>
     <ul class="pipeod-doc-list">
         <li><a class="pipeod-doc-link" href="pipe od/ANSI pipe schedule.pdf" target="_blank"><span class="doc-icon">📄</span>ANSI pipe schedule.pdf</a></li>
@@ -113,19 +121,160 @@
             {nominal: '24” DN600', mm: 610.0},
             {nominal: '30” DN750', mm: 762.0}
         ];
-        document.getElementById('od-input').addEventListener('input', function() {
-            const val = parseFloat(this.value);
-            let found = null;
-            if (!isNaN(val)) {
+        // HDPE 尺寸（ISO 4427 / MS 1058 常见外径）
+        const hdpeSizes = [20,25,32,40,50,63,75,90,110,125,140,160,180,200,225,250,280,315,355,400];
+        const pnToSdr = { 'PN16': 11, 'PN12.5': 13.6, 'PN10': 17 };
+        const densityHDPE = 950; // kg/m^3
+
+        function roundTo(value, decimals) {
+            const p = Math.pow(10, decimals);
+            return Math.round(value * p) / p;
+        }
+
+        function findNearestHdpeOd(inputOd) {
+            let nearest = null;
+            let minDiff = Infinity;
+            for (const od of hdpeSizes) {
+                const diff = Math.abs(od - inputOd);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearest = od;
+                }
+            }
+            // 容差 ±1mm 认为匹配
+            return (minDiff <= 1) ? nearest : null;
+        }
+
+        function calcHdpeWallThickness(od, sdr) {
+            // SDR = OD / t => t = OD / SDR
+            return od / sdr;
+        }
+
+        function calcHdpeWeightPerMeter(od, t) {
+            // 单位：od, t 为 mm；换算到 m 计算体积
+            const od_m = od / 1000;
+            const t_m = t / 1000;
+            const id_m = Math.max(od_m - 2 * t_m, 0);
+            const area = Math.PI * (Math.pow(od_m, 2) - Math.pow(id_m, 2)) / 4; // m^2
+            const volumePerMeter = area * 1; // m^3/m
+            const mass = volumePerMeter * densityHDPE; // kg/m
+            return mass;
+        }
+
+        function renderPnChips(pns, onClick) {
+            const container = document.getElementById('pn-options');
+            container.innerHTML = '';
+            for (const pn of pns) {
+                const a = document.createElement('button');
+                a.textContent = pn;
+                a.style.margin = '0.25em';
+                a.style.padding = '0.4em 0.8em';
+                a.style.border = '1px solid #0a3d91';
+                a.style.background = '#fff';
+                a.style.color = '#0a3d91';
+                a.style.borderRadius = '999px';
+                a.style.cursor = 'pointer';
+                a.onclick = () => onClick(pn);
+                container.appendChild(a);
+            }
+        }
+
+        function showPnDetail(contentHtml) {
+            const box = document.getElementById('pn-detail');
+            box.innerHTML = contentHtml;
+            box.style.display = 'block';
+        }
+
+        function clearPnDetail() {
+            const box = document.getElementById('pn-detail');
+            box.style.display = 'none';
+            box.innerHTML = '';
+        }
+
+        function updateIdentifier() {
+            clearPnDetail();
+            const val = parseFloat(document.getElementById('od-input').value);
+            const material = document.getElementById('material-select').value;
+            const resultEl = document.getElementById('od-result');
+            const pnContainer = document.getElementById('pn-options');
+            pnContainer.innerHTML = '';
+
+            if (isNaN(val)) {
+                resultEl.textContent = '';
+                return;
+            }
+
+            if (material === 'hdpe') {
+                const nearest = findNearestHdpeOd(val);
+                if (nearest === null) {
+                    resultEl.textContent = '未找到匹配的 HDPE 外径 (±1mm)';
+                    return;
+                }
+                const label = 'd' + nearest + ' HDPE, MS 1058 / ISO 4427';
+                resultEl.textContent = label;
+                const pns = ['PN10','PN12.5','PN16'];
+                renderPnChips(pns, (pn) => {
+                    const sdr = pnToSdr[pn];
+                    const t = calcHdpeWallThickness(nearest, sdr);
+                    const tRounded = roundTo(t, 1);
+                    const w = calcHdpeWeightPerMeter(nearest, tRounded);
+                    const wRounded = roundTo(w, 2);
+                    const html = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4em;">
+                            <div style="font-weight:700; color:#0a3d91;">${'d'+nearest} ${pn} (SDR ${sdr})</div>
+                            <button onclick="(function(){document.getElementById('pn-detail').style.display='none'})()" style="border:none; background:#f3f6fc; color:#0a3d91; padding:0.3em 0.6em; border-radius:6px; cursor:pointer;">Close</button>
+                        </div>
+                        <div style="line-height:1.8;">
+                            <div><strong>Standard</strong>: MS 1058 / ISO 4427 (PE100)</div>
+                            <div><strong>OD</strong>: ${nearest} mm</div>
+                            <div><strong>Wall thickness</strong>: ~${tRounded} mm</div>
+                            <div><strong>Approx. weight</strong>: ${wRounded} kg/m</div>
+                            <div style="font-size:0.9em; opacity:0.8; margin-top:0.4em;">注：壁厚为按 SDR 计算的近似值，实际表列值可能四舍五入。重量为理论值，用密度 0.95 g/cm³ 估算。</div>
+                        </div>
+                        <div style="margin-top:0.6em;">
+                            <a class="pipeod-doc-link" href="pipe od/PEPipeSystem.pdf" target="_blank">参考文档：PE Pipe System</a>
+                        </div>
+                    `;
+                    showPnDetail(html);
+                });
+            } else if (material === 'steel') {
+                // 使用现有 ANSI/ASME B36.x 名称表进行匹配（±5mm 容差）
+                let found = null;
                 for (const row of odTable) {
                     if (Math.abs(row.mm - val) <= 5) {
-                        found = row.nominal + ' (OD: ' + row.mm + ' mm)';
+                        found = row;
                         break;
                     }
                 }
+                if (!found) {
+                    resultEl.textContent = 'No matching nominal size (±5mm)';
+                    return;
+                }
+                resultEl.textContent = `${found.nominal} (OD: ${found.mm} mm), ASME B36.10/B36.19`;
+                renderPnChips(['SCH 10S','SCH 40','SCH 80'], (sch) => {
+                    const html = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4em;">
+                            <div style="font-weight:700; color:#0a3d91;">${found.nominal} ${sch}</div>
+                            <button onclick="(function(){document.getElementById('pn-detail').style.display='none'})()" style="border:none; background:#f3f6fc; color:#0a3d91; padding:0.3em 0.6em; border-radius:6px; cursor:pointer;">Close</button>
+                        </div>
+                        <div style="line-height:1.8;">
+                            <div><strong>Standard</strong>: ASME B36.10 (CS) / B36.19 (SS)</div>
+                            <div><strong>OD</strong>: ${found.mm} mm</div>
+                            <div>请参考右侧文档列表中的 ANSI pipe schedule 或 10S 图表以获取壁厚与重量。</div>
+                        </div>
+                        <div style="margin-top:0.6em;">
+                            <a class="pipeod-doc-link" href="pipe od/ANSI pipe schedule.pdf" target="_blank">ANSI pipe schedule.pdf</a>
+                            <span style="margin:0 0.4em;">|</span>
+                            <a class="pipeod-doc-link" href="pipe od/pipe_charts_10S.pdf" target="_blank">pipe_charts_10S.pdf</a>
+                        </div>
+                    `;
+                    showPnDetail(html);
+                });
             }
-            document.getElementById('od-result').textContent = found ? `Nominal size: ${found}` : (this.value ? 'No matching nominal size (±5mm)' : '');
-        });
+        }
+
+        document.getElementById('od-input').addEventListener('input', updateIdentifier);
+        document.getElementById('material-select').addEventListener('change', updateIdentifier);
     </script>
 </body>
 </html>
