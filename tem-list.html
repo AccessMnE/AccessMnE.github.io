@@ -58,7 +58,7 @@
                         <li><button class="menu-button" data-cat="welding" data-subcat="GTAW">GTAW</button></li>
                     </ul>
                 </li>
-                <li><button class="menu-button" data-cat="frp">frp</button></li>
+                <li><button class="menu-button" data-cat="FRP">FRP</button></li>
                 <li><button class="menu-button" data-cat="hand tools">hand tools</button></li>
                 <li><button class="menu-button" data-cat="consumables">consumables</button></li>
                 <li><button class="menu-button" data-cat="electrical">electrical</button></li>
@@ -129,13 +129,11 @@ Pneumatic wrench: box socket,box socket adapter
 
 Puncher: puncher die(_mm)
 
-SMAW welding machine: MS Electrode RB26 (2.6/3.2),MS Electrode LB-52-18 (2.6/3.2),SS Electrode 308L (2.6/3.2),
-SS Electrode 316 (2.6/3.2),SS-other Electrode 309L (2.6/3.2)
+SMAW welding machine: MS Electrode RB26 (2.6/3.2),MS Electrode LB-52-18 (2.6/3.2),SS Electrode 308L (2.6/3.2),SS Electrode 316 (2.6/3.2),SS-other Electrode 309L (2.6/3.2)
 
 MIG welding machine:MS Wire ER70S CO2 (0.8),SS Wire 308 (0.8),Al Wire MC5356m (0.8),CO2 cylinder
 
-TIG welding machine:SS filler rod 308 (2.4/3.2),SS filler rod 316 (1.2/1.6/2.4),Argon cylinder,N2 cylinder (purging),
-Aluminium tape,Sponge,Acid pickling paste,Steel wire brush,used cloth,paint brush (small),stainless steel wax (blue)
+TIG welding machine:SS filler rod 308 (2.4/3.2),SS filler rod 316 (1.2/1.6/2.4),Argon cylinder,N2 cylinder (purging),Aluminium tape,Sponge,Acid pickling paste,Steel wire brush,used cloth,paint brush (small),stainless steel wax (blue)
 
 Roller handle (4"/7"):paint roller refill(4"/7")
 
@@ -177,7 +175,7 @@ Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, seal
                 'oxy cutter',
                 'portable air compressor',
                 'magnetic drill',
-                'diamond/ marble cutter',
+                'diamond cutter',
                 'impact drill',
                 'electrofusion machine',
                 'pneumatic wrench',
@@ -185,21 +183,24 @@ Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, seal
                 'hot plate welding machine',
                 'socket welding machine',
                 'demolition hammer',
-                'puncher',
+                'hydraulic puncher',
                 'tool box(big)',
                 'tool box welder/foreman',
-                'submersible pump'
+                'submersible pump',
+                'cordless drill',
+                'cordless wrench',
+                'diesel generator'
             ]
         },
         'welding': {
             sub: {
                 'SMAW': ['SMAW Welding Machine', 'Ground clamp','Electrode holder'],
-                'GMAW': ['MIG Welding Machine', 'MIG torch','flow meter','regulator','ground clamp'],
-                'GTAW': ['TIG Welding Machine','TIG Torch', 'flow meter','regulator','Tungsten', 'ground clamp']
+                'GMAW': ['MIG Welding Machine', 'MIG torch','mig grease','flow meter','regulator','ground clamp'],
+                'GTAW': ['TIG Welding Machine','TIG Torch', 'flow meter','regulator','Tungsten', 'ground clamp','ceramic cup']
             }
         },
-        'frp': {
-            items: ['FRP Mat', 'Resin', 'Hardener']
+        'FRP': {
+            items: ['FRP Mat', 'FRP Resin VE', 'FRP Hardener MEKP','FRP UV absorber','FRP Tissue','FRP wooven roving','FRP steel roller']
         },
         'hand tools': {
             items: ['Pipe stand', 'G-clamp','Pipe wrench/gastong', 'roller handle(4"/7")',
@@ -223,8 +224,8 @@ Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, seal
                 //jig saw
                 'jig saw blade (wood/metal)',
                 //drilling
-                'drill bit (_mm) (ss/steel/wood)','rotary hammer bit (_mm)',
-                'counter sunk bit (25mm)','hole saw (_mm)','magnetic drill bit(_mm)',
+                'drill bit (_mm) (ss/ steel/ wood/ concrete)','rotary hammer bit (_mm)',
+                'counter sunk bit (25mm)','hole saw (_mm)','magnetic drill bit = annular cutter(_mm)',
                 //wrench
                 'box socket','box socket adapter',
                 //puncher
@@ -649,8 +650,46 @@ th,td{border:1px solid #333;padding:6px 8px;text-align:left}
 </style>
 </head>
 <body>
-<h2>TEM 订单</h2>
+<h2>TEM List</h2>
 <div class="muted">打印时间：${time}</div>
+
+<table style="undefined;table-layout: fixed; width: 351px"><colgroup>
+<col style="width: 100px">
+<col style="width: 200px">
+<col style="width: 100px">
+<col style="width: 200px">
+</colgroup>
+<thead>
+  <tr>
+    <th>Date:</th>
+    <th></th>
+    <th>Job Code:</th>
+    <th></th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td>Attn:</td>
+    <td></td>
+    <td>Delivery Date:</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>From:</td>
+    <td></td>
+    <td>Deliver To:</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Title:</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+
+<linebreak><br>
+
 <table>
 <thead><tr><th>#</th><th>Item</th><th>Qty</th></tr></thead>
 <tbody>${rows}</tbody>

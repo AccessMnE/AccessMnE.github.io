@@ -1,13 +1,13 @@
 (() => {
   const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
   const DAY_LABELS = {
-    mon: "星期一",
-    tue: "星期二",
-    wed: "星期三",
-    thu: "星期四",
-    fri: "星期五",
-    sat: "星期六",
-    sun: "星期日",
+    mon: "Isnin",
+    tue: "Selasa",
+    wed: "Rabu",
+    thu: "Khamis",
+    fri: "Jumaat",
+    sat: "Sabtu",
+    sun: "Ahad",
   };
 
   const STORAGE_KEY = "schedule_app_state_v2";
@@ -48,7 +48,7 @@
       // 生成导出文本
       const day = exportDay.value;
       const date = exportDate.value.trim();
-      let output = `【${DAY_LABELS[day]}】${date ? " " + date : ""}\n`;
+      let output = `Jadual Kerja【${DAY_LABELS[day]}】${date ? " " + date : ""}\n`;
       output += "Job Code\tWorker\n";
       state.rows.forEach(row => {
         const workers = row.assignments[day] || [];

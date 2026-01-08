@@ -3,101 +3,152 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>排班表</title>
+    <title>排班表 - Work Schedule Board</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="app-header">
-      <h1>Work Schedule Board</h1>
-      <div class="actions">
-        <button id="add-row">+ 添加 Job Code 行</button>
-        <button id="clear-all" class="danger">清空数据</button>
-        <div class="export-controls">
-          <select id="export-day" title="选择星期">
-            <option value="mon">Monday</option>
-            <option value="tue">Tuesday</option>
-            <option value="wed">Wednesday</option>
-            <option value="thu">Thursday</option>
-            <option value="fri">Friday</option>
-            <option value="sat">Saturday</option>
-            <option value="sun">Sunday</option>
-          </select>
-          <input id="export-date" type="text" placeholder="输入日期 (如: 2025-08-12)" />
-          <button id="export-btn">导出文本</button>
+      <div class="header-content">
+        <div class="header-title-section">
+          <h1>Work Schedule Board</h1>
+          <p class="header-subtitle">高效管理 Job Code 与一周排班</p>
         </div>
-        <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
+        <nav class="actions" aria-label="主要操作">
+          <div class="action-group primary-actions">
+            <button id="add-row" aria-label="添加新的 Job Code 行">
+              <span class="button-icon">+</span>
+              <span class="button-text">添加 Job Code 行</span>
+            </button>
+            <button id="clear-all" class="danger" aria-label="清空所有数据">
+              <span class="button-text">清空数据</span>
+            </button>
+          </div>
+          <div class="export-controls" role="group" aria-label="导出控制">
+            <div class="export-field">
+              <label for="export-day" class="sr-only">选择星期</label>
+              <select id="export-day" title="选择星期" aria-label="选择要导出的星期">
+                <option value="mon">Mon</option>
+                <option value="tue">Tue</option>
+                <option value="wed">Wed</option>
+                <option value="thu">Thu</option>
+                <option value="fri">Fri</option>
+                <option value="sat">Sat</option>
+                <option value="sun">Sun</option>
+              </select>
+            </div>
+            <div class="export-field">
+              <label for="export-date" class="sr-only">输入日期</label>
+              <input id="export-date" type="text" placeholder="输入日期 (如: 2025-08-12)" aria-label="输入导出日期" />
+            </div>
+            <button id="export-btn" aria-label="导出排班文本">
+              <span class="button-text">导出文本</span>
+            </button>
+          </div>
+          <div class="action-group navigation-actions">
+            <button class="home-btn" onclick="window.location.href='index.html'" aria-label="返回首页">
+              <span class="button-text">Home</span>
+            </button>
+          </div>
+        </nav>
       </div>
     </header>
 
+    <!-- 可拖拽的 Worker Quick Access 侧边栏 -->
+    <aside id="worker-sidebar" class="worker-sidebar" role="complementary" aria-label="Worker Quick Access">
+      <div class="worker-sidebar-header">
+        <h3>Worker Quick Access</h3>
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="折叠/展开侧边栏">−</button>
+      </div>
+      <div class="worker-sidebar-content">
+        <div class="worker-input" role="group" aria-label="添加 Worker">
+          <label for="worker-name" class="sr-only">Worker 名称</label>
+          <input id="worker-name" type="text" placeholder="输入 worker 名称" aria-label="输入 worker 名称" />
+          <button id="add-worker" aria-label="添加 worker">
+            <span class="button-text">添加</span>
+          </button>
+        </div>
+        <div class="worker-list-container">
+          <ul id="worker-list" class="worker-list" role="list" aria-label="Worker 列表"></ul>
+        </div>
+        <div class="worker-sidebar-footer">
+          <span id="worker-total" aria-live="polite" aria-atomic="true">总数：0</span>
+        </div>
+      </div>
+      <div class="sidebar-drag-handle" id="sidebar-drag-handle" aria-label="拖拽侧边栏"></div>
+    </aside>
+
     <main class="layout">
-      <aside class="sidebar">
-        <h2>Worker 列表</h2>
-        <div class="worker-input">
-          <input id="worker-name" type="text" placeholder="输入 worker 名称" />
-          <button id="add-worker">添加</button>
+      <section class="board" role="region" aria-label="排班表">
+        <div class="board-header">
+          <h2 class="board-title">一周排班表</h2>
+          <p class="board-description">为每个 Job Code 分配 Worker 到对应日期</p>
         </div>
-        <ul id="worker-list" class="worker-list"></ul>
-        <div class="sidebar-footer">
-          <span id="worker-total">总数：0</span>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table id="schedule-table" role="table" aria-label="工作排班表">
+              <colgroup>
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+                <col style="width:11.11%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="col-job" scope="col">Job Code</th>
+                  <th scope="col">Mon</th>
+                  <th scope="col">Tue</th>
+                  <th scope="col">Wedy</th>
+                  <th scope="col">Thu</th>
+                  <th scope="col">Fri</th>
+                  <th scope="col">Sat</th>
+                  <th scope="col">Sun</th>
+                  <th scope="col">Operation</th>
+                </tr>
+              </thead>
+              <tbody id="table-body" role="rowgroup"></tbody>
+            </table>
+          </div>
         </div>
-      </aside>
-
-      <section class="board">
-        <div class="table-wrapper">
-          <table id="schedule-table">
-            <colgroup>
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-              <col style="width:11.11%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th class="col-job">Job Code</th>
-                <th>Monday</th>
-                <th>Tuesday</th>
-                <th>Wednesday</th>
-                <th>Thursday</th>
-                <th>Friday</th>
-                <th>Saturday</th>
-                <th>Sunday</th>
-                <th>Opertaion</th>
-              </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-          </table>
-        </div>
-
-        
       </section>
     </main>
 
-    <footer class="app-footer">
-      <span>数据保存在浏览器本地（LocalStorage）。</span>
+    <footer class="app-footer" role="contentinfo">
+      <div class="footer-content">
+        <span>数据保存在浏览器本地（LocalStorage）。</span>
+        <span class="footer-hint">数据自动保存，无需手动操作</span>
+      </div>
     </footer>
 
     <!-- 导出弹窗 -->
-    <div id="export-modal" class="modal hidden" role="dialog" aria-modal="true">
-      <div class="modal-backdrop"></div>
+    <div id="export-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+      <div class="modal-backdrop" aria-hidden="true"></div>
       <div class="modal-content">
         <div class="modal-header">
-          <h3>导出文本</h3>
+          <h3 id="export-modal-title">导出文本</h3>
           <div class="spacer"></div>
-          <button id="export-copy" class="copy-btn">复制</button>
-          <button id="export-close" class="close-btn">关闭</button>
+          <div class="modal-actions">
+            <button id="export-copy" class="copy-btn" aria-label="复制导出文本">
+              <span class="button-text">复制</span>
+            </button>
+            <button id="export-close" class="close-btn" aria-label="关闭弹窗">
+              <span class="button-text">关闭</span>
+            </button>
+          </div>
         </div>
         <div class="modal-body">
-          <textarea id="export-text" class="export-text" rows="16"></textarea>
+          <label for="export-text" class="sr-only">导出文本内容</label>
+          <textarea id="export-text" class="export-text" rows="16" aria-label="导出的排班文本" readonly></textarea>
         </div>
       </div>
     </div>
 
     <script src="main.js"></script>
+    <script src="sidebar-drag.js"></script>
   </body>
   </html>
 
