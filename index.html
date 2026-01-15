@@ -5,6 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Access MNE</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2em;
+            text-align: center;
+        }
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 2em;
+        }
+        .center-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 2em;
+        }
+        .center-nav a {
+            display: inline-block;
+            padding: 10px 22px;
+            background: linear-gradient(92deg, var(--primary), #5797ff 70%);
+            color: #fff;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-size: 1em;
+            font-weight: 700;
+            box-shadow: 0 1.5px 8px 0 rgba(37,99,235,.075);
+            border: none;
+            letter-spacing: .01em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .center-nav a:hover, .center-nav a:focus {
+            background: linear-gradient(90deg, var(--primary-hover), #4073e9 70%);
+            transform: translateY(-2px) scale(1.03);
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
     <div class="main-content">
