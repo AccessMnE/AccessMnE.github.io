@@ -1,4 +1,751 @@
-<button class="home-btn" onclick="window.location.href='index.html'">Home</button>
-<!-- Main content -->
-<h1>About</h1>
-<p>This page provides information about Access MNE.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Access M&E Services</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* About Page Specific Styles - 不修改 styles.css */
+        .about-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2em 1em;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
+            border-radius: 24px;
+            padding: 4em 2em;
+            margin-bottom: 4em;
+            box-shadow: 0 20px 60px rgba(37,99,235,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .hero-section h1 {
+            color: white;
+            font-size: 3.5em;
+            margin-bottom: 0.3em;
+            font-weight: 900;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+        .hero-section .subtitle {
+            font-size: 1.8em;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 0.5em;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+        .hero-section .since {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 0.8em 2em;
+            border-radius: 999px;
+            font-weight: 700;
+            margin: 1.5em 0;
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .hero-section .since:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* Section Styles */
+        .about-section {
+            background: var(--panel);
+            border-radius: 20px;
+            padding: 3em;
+            margin-bottom: 3em;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .about-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(37,99,235,0.15);
+        }
+        .about-section h2 {
+            color: var(--primary);
+            font-size: 2.2em;
+            margin-bottom: 1.5em;
+            border-bottom: 4px solid var(--primary-light);
+            padding-bottom: 0.8em;
+            font-weight: 800;
+            position: relative;
+        }
+        .about-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .about-section h3 {
+            color: var(--primary);
+            font-size: 1.6em;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-weight: 700;
+        }
+        .about-section p {
+            line-height: 1.9;
+            color: var(--text);
+            margin-bottom: 1.2em;
+            font-size: 1.1em;
+        }
+        
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2em;
+            margin-top: 2em;
+        }
+        .service-card {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f5ff 100%);
+            padding: 2em;
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), #60a5fa);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        .service-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(37,99,235,0.2);
+            border-color: var(--primary);
+        }
+        .service-card h4 {
+            color: var(--primary);
+            margin-bottom: 1em;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+        .service-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .service-card li {
+            padding: 0.6em 0;
+            color: var(--text);
+            border-bottom: 1px dashed var(--border);
+            transition: padding-left 0.3s;
+        }
+        .service-card li:hover {
+            padding-left: 0.5em;
+        }
+        .service-card li:last-child {
+            border-bottom: none;
+        }
+        .service-card li:before {
+            content: "✓ ";
+            color: var(--primary);
+            font-weight: bold;
+            margin-right: 0.8em;
+            font-size: 1.2em;
+        }
+        
+        /* Image Gallery */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2em;
+            margin: 2em 0;
+        }
+        .image-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: var(--panel-2);
+            aspect-ratio: 16/10;
+        }
+        .image-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(37,99,235,0.25);
+        }
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+            display: block;
+        }
+        .image-card:hover img {
+            transform: scale(1.1);
+        }
+        .image-card .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ff 100%);
+            color: var(--primary);
+            font-weight: 600;
+            text-align: center;
+            padding: 2em;
+            border: 2px dashed var(--primary);
+            border-radius: 16px;
+        }
+        .image-card img[src=""],
+        .image-card img:not([src]),
+        .image-card img[style*="display: none"] {
+            display: none !important;
+        }
+        .image-card .image-placeholder {
+            display: none;
+        }
+        .image-card:has(img[src=""]) .image-placeholder,
+        .image-card:has(img:not([src])) .image-placeholder,
+        .image-card:has(img[style*="display: none"]) .image-placeholder {
+            display: flex !important;
+        }
+        .image-card:has(img[src]:not([src=""]):not([style*="display: none"])) .image-placeholder {
+            display: none !important;
+        }
+        .image-card .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 1.5em 1em 1em;
+            font-weight: 600;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        .image-card:hover .image-label {
+            transform: translateY(0);
+        }
+        
+        /* Materials List */
+        .materials-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8em;
+            margin-top: 1.5em;
+        }
+        .material-tag {
+            background: linear-gradient(135deg, var(--panel) 0%, var(--primary-light) 100%);
+            padding: 0.7em 1.5em;
+            border-radius: 999px;
+            border: 2px solid var(--border);
+            font-size: 0.95em;
+            color: var(--text);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .material-tag:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+        
+        /* Certificates */
+        .certificates-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5em;
+            margin-top: 2em;
+        }
+        .cert-item {
+            background: linear-gradient(135deg, var(--panel-2) 0%, var(--primary-light) 100%);
+            padding: 1.5em 2em;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .cert-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 16px rgba(37,99,235,0.2);
+        }
+        
+        /* Locations */
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.2em;
+            margin-top: 2em;
+        }
+        .location-tag {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ff 100%);
+            padding: 1em 1.5em;
+            border-radius: 12px;
+            text-align: center;
+            color: var(--primary);
+            font-weight: 600;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+        .location-tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(37,99,235,0.3);
+        }
+        
+        /* Company Info */
+        .company-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2em;
+            margin-top: 2em;
+        }
+        .info-card {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f5ff 100%);
+            padding: 2em;
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(37,99,235,0.2);
+            border-color: var(--primary);
+        }
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 1em;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+        .info-card p {
+            margin: 0.5em 0;
+            color: var(--text);
+            line-height: 1.8;
+        }
+        
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+            padding: 2.5em;
+            border-radius: 20px;
+            border: none;
+            margin: 2.5em 0;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(37,99,235,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .highlight-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 6s ease-in-out infinite;
+        }
+        .highlight-box p {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: white;
+            margin: 0.8em 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* Lists */
+        .about-section ul {
+            line-height: 2.2;
+            color: var(--text);
+            margin-left: 1.5em;
+            margin-top: 1em;
+        }
+        .about-section ul li {
+            margin-bottom: 0.5em;
+            position: relative;
+            padding-left: 0.5em;
+        }
+        .about-section ul li::marker {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2.2em;
+            }
+            .about-section {
+                padding: 2em 1.5em;
+            }
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
+    
+    <div class="about-container">
+        <!-- Hero Section - Slide 1 -->
+        <div class="hero-section">
+            <h1>Access M&E Services Sdn Bhd</h1>
+            <p class="subtitle">(889580-T)</p>
+            <p class="subtitle">Mechanical Contractor based in Johor</p>
+            <span class="since">Since 2010</span>
+        </div>
+
+        <!-- Services Overview -->
+        <div class="about-section">
+            <h2>Our Services</h2>
+            <p style="font-size: 1.2em; color: var(--muted); margin-bottom: 2em;">
+                We provide comprehensive mechanical contracting services with a commitment to quality and excellence.
+            </p>
+            <div class="services-grid">
+                <div class="service-card">
+                    <h4>Steel Piping</h4>
+                </div>
+                <div class="service-card">
+                    <h4>Non-metallic Piping</h4>
+                </div>
+                <div class="service-card">
+                    <h4>Equipment/Structure Installation</h4>
+                </div>
+                <div class="service-card">
+                    <h4>Maintenance & Repair Services</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products & Services - Slide 2 -->
+        <div class="about-section">
+            <h2>Products & Services</h2>
+            
+            <h3>Metal Piping</h3>
+            <ul>
+                <li>GTAW (TIG)</li>
+                <li>GMAW (MIG)</li>
+                <li>SMAW</li>
+                <li>Hydrostatic and pneumatic testing</li>
+            </ul>
+
+            <h3>Non-metallic Piping</h3>
+            <ul>
+                <li>Electrofusion (HDPE)</li>
+                <li>Butt fusion</li>
+                <li>Socket fusion</li>
+                <li>Extrusion / Hot air welding</li>
+                <li>Solvent cement</li>
+                <li>FRP lining</li>
+                <li>FRP piping</li>
+            </ul>
+
+            <h3>Materials</h3>
+            <div class="materials-list">
+                <span class="material-tag">ABS</span>
+                <span class="material-tag">HDPE</span>
+                <span class="material-tag">PE</span>
+                <span class="material-tag">PVC</span>
+                <span class="material-tag">UPVC</span>
+                <span class="material-tag">PP</span>
+                <span class="material-tag">PVDF</span>
+                <span class="material-tag">FRP</span>
+            </div>
+
+            <h3>Water Tank Replacement</h3>
+
+            <h3>Structure Modification</h3>
+            <ul>
+                <li>Platform</li>
+                <li>Spiral staircase</li>
+            </ul>
+
+            <h3>Grating Installation</h3>
+            <ul>
+                <li>HDG</li>
+                <li>FRP</li>
+                <li>Expanded Metal</li>
+                <li>Fencing</li>
+                <li>Drain Cover</li>
+            </ul>
+
+            <h3>Maintenance & Repair Services</h3>
+            <ul>
+                <li>Lifting Work</li>
+                <li>Vent</li>
+                <li>Minor Civil Work and Insulation</li>
+            </ul>
+
+            <p style="margin-top: 2em; font-style: italic; color: var(--muted); font-size: 1.05em;">
+                And other services can be arranged through our reliable subcontractor network.
+            </p>
+        </div>
+
+        <!-- PP Piping Images - Slide 6 -->
+        <div class="about-section">
+            <h2>PP Piping Projects</h2>
+            <div class="image-gallery">
+                <div class="image-card">
+                    <img src="about-images/pp-piping-1.jpg" alt="PP Piping Project 1" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/pp-piping-1.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">PP Piping Project 1</div>
+                </div>
+                <div class="image-card">
+                    <img src="about-images/pp-piping-2.jpg" alt="PP Piping Project 2" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/pp-piping-2.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">PP Piping Project 2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plastic Piping Images - Slide 7-8 -->
+        <div class="about-section">
+            <h2>Plastic Piping Projects</h2>
+            <div class="image-gallery">
+                <div class="image-card">
+                    <img src="about-images/plastic-piping-1.jpg" alt="Plastic Piping Project 1" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/plastic-piping-1.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">Plastic Piping Project 1</div>
+                </div>
+                <div class="image-card">
+                    <img src="about-images/plastic-piping-2.jpg" alt="Plastic Piping Project 2" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/plastic-piping-2.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">Plastic Piping Project 2</div>
+                </div>
+                <div class="image-card">
+                    <img src="about-images/plastic-piping-3.jpg" alt="Plastic Piping Project 3" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/plastic-piping-3.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">Plastic Piping Project 3</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Steel & Sanitary Piping Images - Slide 9 -->
+        <div class="about-section">
+            <h2>Steel & Sanitary Piping Projects</h2>
+            <div class="image-gallery">
+                <div class="image-card">
+                    <img src="about-images/steel-piping-1.jpg" alt="Steel Piping Project 1" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/steel-piping-1.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">Steel Piping Project 1</div>
+                </div>
+                <div class="image-card">
+                    <img src="about-images/steel-piping-2.jpg" alt="Steel Piping Project 2" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/steel-piping-2.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">Steel Piping Project 2</div>
+                </div>
+                <div class="image-card">
+                    <img src="about-images/sanitary-piping-1.jpg" alt="Sanitary Piping Project" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/sanitary-piping-1.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">Sanitary Piping Project</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FRP Services - Slide 10 -->
+        <div class="about-section">
+            <h2>FRP Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <h4>FRP Lining</h4>
+                </div>
+                <div class="service-card">
+                    <h4>FRP Piping</h4>
+                </div>
+            </div>
+            <div class="image-gallery" style="margin-top: 2em;">
+                <div class="image-card">
+                    <img src="about-images/frp-lining-1.jpg" alt="FRP Lining Project" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/frp-lining-1.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">FRP Lining Project</div>
+                </div>
+                <div class="image-card">
+                    <img src="about-images/frp-piping-1.jpg" alt="FRP Piping Project" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='flex';">
+                    <div class="image-placeholder">
+                        <div>
+                            <strong>Image Placeholder</strong><br>
+                            <small>about-images/frp-piping-1.jpg</small>
+                        </div>
+                    </div>
+                    <div class="image-label">FRP Piping Project</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team - Slide 3 -->
+        <div class="about-section">
+            <h2>Our Team</h2>
+            <div class="highlight-box">
+                <p>A TEAM THAT ALWAYS PREPARE</p>
+            </div>
+            <h3>Engineering Drawing</h3>
+            <ul>
+                <li>AS BUILT / ISO / P&ID / 3D</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 2em;">
+                <p>NOT JUST "DOING", BUT UNDERSTANDING</p>
+            </div>
+            <div class="highlight-box">
+                <p>A TEAM THAT UPDATE YOU ON-TIME</p>
+                <p style="font-size: 1.2em; margin-top: 0.5em;">DO IT SAFE, DO IT RIGHT, AND DO IT FAST.</p>
+            </div>
+            <p style="margin-top: 2em; font-weight: 600; color: var(--primary); font-size: 1.2em;">
+                Malaysian Supervisor and Foreman
+            </p>
+        </div>
+
+        <!-- Certificates - Slide 4 -->
+        <div class="about-section">
+            <h2>Certificates & Accreditation</h2>
+            <div class="certificates-list">
+                <div class="cert-item">CIDB - G4 B/CE/ME</div>
+                <div class="cert-item">Working at Height & Confined Space</div>
+                <div class="cert-item">Welding Procedures Specification (WPS)</div>
+                <div class="cert-item">JSA, MOS and Permit to Work (PTW)</div>
+                <div class="cert-item">Work completion report</div>
+                <div class="cert-item">Weld map, weld log and progress</div>
+            </div>
+            <p style="margin-top: 2em; font-weight: 700; color: var(--primary); font-size: 1.2em;">
+                Systematic & Documented
+            </p>
+        </div>
+
+        <!-- Service Locations - Slide 5 -->
+        <div class="about-section">
+            <h2>Service Locations</h2>
+            <p style="font-size: 1.1em; margin-bottom: 1.5em;">
+                We serve clients in various locations across Malaysia:
+            </p>
+            <div class="locations-grid">
+                <div class="location-tag">Johor Bahru</div>
+                <div class="location-tag">Tampoi</div>
+                <div class="location-tag">Plentong</div>
+                <div class="location-tag">Tanjung Langsat</div>
+                <div class="location-tag">Pasir Gudang</div>
+                <div class="location-tag">Gelang Patah</div>
+                <div class="location-tag">Tanjung Bin</div>
+                <div class="location-tag">Senai</div>
+                <div class="location-tag">Sedenak, Johor</div>
+                <div class="location-tag">Kuantan, Pahang</div>
+                <div class="location-tag">Penawar</div>
+                <div class="location-tag">And other locations</div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="about-section">
+            <h2>Contact Us</h2>
+            <div class="company-info">
+                <div class="info-card">
+                    <h3>Address</h3>
+                    <p>No. 36, Jalan Mutiara Emas 5/11</p>
+                    <p>Taman Mount Austin</p>
+                    <p>81100, Johor Bahru, Johor</p>
+                    <p>Malaysia</p>
+                </div>
+                <div class="info-card">
+                    <h3>Contact Details</h3>
+                    <p><strong>Tel:</strong> 07-351 3720</p>
+                    <p><strong>Fax:</strong> 07-358 7090</p>
+                    <p><strong>Email:</strong> sales@accessmne.com.my</p>
+                </div>
+                <div class="info-card">
+                    <h3>Website</h3>
+                    <p>https://accessmne.github.io/</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
