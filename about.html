@@ -16,23 +16,15 @@
         /* Hero Section */
         .hero-section {
             text-align: center;
-            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
-            border-radius: 24px;
-            padding: 4em 2em;
-            margin-bottom: 4em;
-            box-shadow: 0 20px 60px rgba(37,99,235,0.3);
+            background: transparent;
+            border-radius: 0;
+            padding: 3em 0 3.5em 0;
+            margin-bottom: 3.5em;
+            box-shadow: none;
             position: relative;
-            overflow: hidden;
         }
         .hero-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 8s ease-in-out infinite;
+            content: none;
         }
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.5; }
@@ -57,21 +49,132 @@
         }
         .hero-section .since {
             display: inline-block;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.14);
             backdrop-filter: blur(10px);
             color: white;
             padding: 0.8em 2em;
             border-radius: 999px;
             font-weight: 700;
             margin: 1.5em 0;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.35);
             position: relative;
             z-index: 1;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
         }
         .hero-section .since:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.22);
+        }
+
+        /* Hero slider */
+        .hero-slider {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            height: 360px;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+        }
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(1.03);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .hero-slide::before {
+            content: none;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: #0f172a;
+            padding: 1.8rem 2.8rem;
+            background: rgba(255,255,255,0.5);
+            border-radius: 18px;
+            max-width: 760px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(15,23,42,0.25);
+        }
+        .hero-content h1 {
+            font-size: 3em;
+            margin-bottom: 0.3em;
+            font-weight: 900;
+        }
+        .hero-content h2 {
+            font-size: 2.4em;
+            margin-bottom: 0.4em;
+            font-weight: 800;
+        }
+        .hero-content p {
+            font-size: 1.15em;
+            opacity: 0.9;
+        }
+        .hero-badge {
+            display: inline-block;
+            margin-top: 1.2em;
+            padding: 0.6em 1.6em;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.6);
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .hero-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.7);
+            background: rgba(15,23,42,0.35);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .hero-nav:hover {
+            background: rgba(15,23,42,0.75);
+        }
+        .hero-nav.prev { left: 18px; }
+        .hero-nav.next { right: 18px; }
+        .hero-dots {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+        .hero-dots .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(255,255,255,0.4);
+            cursor: pointer;
+            padding: 0;
+        }
+        .hero-dots .dot.active {
+            width: 22px;
+            background: #fff;
         }
         
         /* Section Styles */
@@ -417,6 +520,18 @@
         
         /* Responsive */
         @media (max-width: 768px) {
+            .hero-slider {
+                height: 260px;
+            }
+            .hero-content h1 {
+                font-size: 2.1em;
+            }
+            .hero-content h2 {
+                font-size: 1.8em;
+            }
+            .hero-content p {
+                font-size: 1em;
+            }
             .hero-section h1 {
                 font-size: 2.2em;
             }
@@ -433,12 +548,39 @@
     <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
     
     <div class="about-container">
-        <!-- Hero Section - Slide 1 -->
+        <!-- Hero Slider -->
         <div class="hero-section">
-            <h1>Access M&E Services Sdn Bhd</h1>
-            <p class="subtitle">(889580-T)</p>
-            <p class="subtitle">Mechanical Contractor based in Johor</p>
-            <span class="since">Since 2010</span>
+            <div class="hero-slider">
+                <div class="hero-slide active" data-index="0" style="background-image: url('about-images/hero-1.jpg');">
+                    <div class="hero-content">
+                        <h1>Access M&E Services Sdn Bhd</h1>
+                        <p class="subtitle">(889580-T)</p>
+                        <p class="subtitle">Mechanical Contractor based in Johor</p>
+                        <div class="hero-badge">Since 2010</div>
+                    </div>
+                </div>
+                <div class="hero-slide" data-index="1" style="background-image: url('about-images/hero-2.jpg');">
+                    <div class="hero-content">
+                        <h2>Steel &amp; Plastic Piping Specialists</h2>
+                        <p>Steel Piping · Non-metallic Piping · Equipment &amp; Structure Installation</p>
+                        <div class="hero-badge">Maintenance &amp; Repair Services</div>
+                    </div>
+                </div>
+                <div class="hero-slide" data-index="2" style="background-image: url('about-images/hero-3.jpg');">
+                    <div class="hero-content">
+                        <h2>Serving Johor &amp; Beyond</h2>
+                        <p>Projects in Johor Bahru, Pasir Gudang, Tanjung Langsat, Kuantan and more.</p>
+                        <div class="hero-badge">Quality Engineering Services</div>
+                    </div>
+                </div>
+                <button class="hero-nav prev" type="button">&#10094;</button>
+                <button class="hero-nav next" type="button">&#10095;</button>
+                <div class="hero-dots">
+                    <button class="dot active" type="button" data-index="0"></button>
+                    <button class="dot" type="button" data-index="1"></button>
+                    <button class="dot" type="button" data-index="2"></button>
+                </div>
+            </div>
         </div>
 
         <!-- Services Overview -->
@@ -747,5 +889,66 @@
             </div>
         </div>
     </div>
+    <script>
+        (function() {
+            var slider = document.querySelector('.hero-slider');
+            if (!slider) return;
+            var slides = slider.querySelectorAll('.hero-slide');
+            var dots = slider.querySelectorAll('.hero-dots .dot');
+            var prevBtn = slider.querySelector('.hero-nav.prev');
+            var nextBtn = slider.querySelector('.hero-nav.next');
+            var current = 0;
+            var timer = null;
+
+            function goTo(index) {
+                slides[current].classList.remove('active');
+                dots[current].classList.remove('active');
+                current = (index + slides.length) % slides.length;
+                slides[current].classList.add('active');
+                dots[current].classList.add('active');
+            }
+
+            function next(step) {
+                goTo(current + step);
+            }
+
+            function start() {
+                stop();
+                timer = setInterval(function() {
+                    next(1);
+                }, 7000);
+            }
+
+            function stop() {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', function() {
+                    stop();
+                    next(-1);
+                    start();
+                });
+                nextBtn.addEventListener('click', function() {
+                    stop();
+                    next(1);
+                    start();
+                });
+            }
+
+            dots.forEach(function(dot, idx) {
+                dot.addEventListener('click', function() {
+                    stop();
+                    goTo(idx);
+                    start();
+                });
+            });
+
+            start();
+        })();
+    </script>
 </body>
 </html>
