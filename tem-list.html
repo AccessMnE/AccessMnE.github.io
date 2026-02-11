@@ -41,6 +41,62 @@
         .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .tag { display: inline-block; padding: 2px 6px; border-radius: 999px; border: 1px solid #eee; font-size: 12px; background: #fafafa; }
         .empty { color: #666; padding: 20px; border: 1px dashed #ddd; border-radius: 8px; text-align: center; }
+
+        /* Header info mini window */
+        .header-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.35);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .header-modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 18px 14px 18px;
+            min-width: 280px;
+            max-width: 360px;
+            box-shadow: 0 10px 30px rgba(15,23,42,0.35);
+            font-size: 13px;
+        }
+        .header-modal h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+        }
+        .header-modal-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 90px 1fr;
+            gap: 6px 8px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .header-modal-row.single {
+            grid-template-columns: 80px 1fr;
+        }
+        .header-modal label {
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .header-modal input {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .header-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .header-modal-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -100,9 +156,43 @@
             <div id="cartEmpty" class="empty" style="margin-top:10px;">订单为空，双击左侧物品加入。</div>
             <ul id="cartList" class="cart-list"></ul>
             <div class="toolbar" style="margin-top:10px;">
+                <button id="headerInfoBtn" type="button">Header Info</button>
                 <button id="printBtn" type="button">打印订单</button>
             </div>
         </aside>
+    </div>
+
+    <!-- Header info mini window -->
+    <div id="headerModalBackdrop" class="header-modal-backdrop">
+        <div class="header-modal">
+            <h3>Header Information</h3>
+            <div class="header-modal-row">
+                <label for="headerDate">Date:</label>
+                <input type="text" id="headerDate" placeholder="e.g. 2026-02-09">
+                <label for="headerJobCode">Job Code:</label>
+                <input type="text" id="headerJobCode" placeholder="e.g. J-00123">
+            </div>
+            <div class="header-modal-row">
+                <label for="headerAttn">Attn:</label>
+                <input type="text" id="headerAttn">
+                <label for="headerDeliveryDate">Delivery Date:</label>
+                <input type="text" id="headerDeliveryDate">
+            </div>
+            <div class="header-modal-row">
+                <label for="headerFrom">From:</label>
+                <input type="text" id="headerFrom">
+                <label for="headerDeliverTo">Deliver To:</label>
+                <input type="text" id="headerDeliverTo">
+            </div>
+            <div class="header-modal-row single">
+                <label for="headerTitle">Title:</label>
+                <input type="text" id="headerTitle">
+            </div>
+            <div class="header-modal-actions">
+                <button type="button" id="headerCancelBtn">Cancel</button>
+                <button type="button" id="headerSaveBtn">Save</button>
+            </div>
+        </div>
     </div>
 
     <!-- recommend 配置区（不显示在页面）。
@@ -163,6 +253,17 @@ Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, seal
     </section>
 
     <script>
+    // Header info used when printing (optional)
+    const headerInfo = {
+        date: '',
+        jobCode: '',
+        attn: '',
+        deliveryDate: '',
+        from: '',
+        deliverTo: '',
+        title: ''
+    };
+
     // 数据结构：一级分类与（可选）二级分类。占位 item 可自行替换。
     const catalog = {
         'power tools': {
@@ -590,13 +691,43 @@ Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, seal
         cart.set(name, current + 1);
         renderCart();
     }
-    function inc(name) { cart.set(name, (cart.get(name) || 1) + 1); renderCart(); }
+        function inc(name) { cart.set(name, (cart.get(name) || 1) + 1); renderCart(); }
     function dec(name) {
         const q = (cart.get(name) || 1) - 1;
         if (q <= 0) cart.delete(name); else cart.set(name, q);
         renderCart();
     }
     function removeItem(name) { cart.delete(name); renderCart(); }
+
+        // Header info mini window
+        function openHeaderModal() {
+            const backdrop = document.getElementById('headerModalBackdrop');
+            if (!backdrop) return;
+            document.getElementById('headerDate').value = headerInfo.date || '';
+            document.getElementById('headerJobCode').value = headerInfo.jobCode || '';
+            document.getElementById('headerAttn').value = headerInfo.attn || '';
+            document.getElementById('headerDeliveryDate').value = headerInfo.deliveryDate || '';
+            document.getElementById('headerFrom').value = headerInfo.from || '';
+            document.getElementById('headerDeliverTo').value = headerInfo.deliverTo || '';
+            document.getElementById('headerTitle').value = headerInfo.title || '';
+            backdrop.style.display = 'flex';
+        }
+
+        function closeHeaderModal() {
+            const backdrop = document.getElementById('headerModalBackdrop');
+            if (backdrop) backdrop.style.display = 'none';
+        }
+
+        function saveHeaderModal() {
+            headerInfo.date = document.getElementById('headerDate').value || '';
+            headerInfo.jobCode = document.getElementById('headerJobCode').value || '';
+            headerInfo.attn = document.getElementById('headerAttn').value || '';
+            headerInfo.deliveryDate = document.getElementById('headerDeliveryDate').value || '';
+            headerInfo.from = document.getElementById('headerFrom').value || '';
+            headerInfo.deliverTo = document.getElementById('headerDeliverTo').value || '';
+            headerInfo.title = document.getElementById('headerTitle').value || '';
+            closeHeaderModal();
+        }
 
     function renderCart() {
         const list = document.getElementById('cartList');
@@ -653,97 +784,139 @@ Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, seal
             }
         });
         
-        // 生成表格行
-        function generateTableRows(items) {
+        // 每页最多 25 行 item
+        const maxRowsPerPage = 25;
+
+        function buildRows(items, startIndex) {
             let rows = '';
-            let index = 1;
-            items.forEach(item => {
+            items.forEach((item, idx) => {
                 const formattedName = formatDisplayName(item.name);
-                rows += `<tr><td>${index++}</td><td>${formattedName}</td><td></td><td>${item.qty}</td><td></td></tr>`;
+                const no = startIndex + idx + 1;
+                rows += `<tr><td>${no}</td><td>${formattedName}</td><td></td><td>${item.qty}</td><td></td></tr>`;
             });
             return rows;
         }
-        
-        const consumablesRows = generateTableRows(consumables);
-        const toolsRows = generateTableRows(toolsAndEquipment);
-        
-        const time = new Date().toLocaleString();
-        const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>TEM List</title>
-<style>
-@page {
-    size: A4;
-}
-body{font-family:Arial,Helvetica,sans-serif;padding:20px;margin:0}
-.logo-header{text-align:center;margin-bottom:15px}
-.logo-header img{height:60px;width:auto}
-h3{margin:20px 0 8px;font-size:16px}
-table{width:100%;border-collapse:collapse;margin-bottom:20px;page-break-inside:avoid}
-th,td{border:1px solid #333;padding:6px 8px;text-align:left}
-th{background-color:#f0f0f0;font-weight:bold}
-.muted{color:#666;margin-bottom:10px;font-size:12px}
-.header-table{width:100%;margin-bottom:20px}
-@media print{
-    button{display:none}
-    body{padding:0}
-    h3{margin-top:10px}
-    table{font-size:11px}
-    .logo-header{margin-bottom:10px}
-    .logo-header img{height:50px}
-}
-</style>
-</head>
-<body>
-<div class="logo-header"><img src="access logo.png" alt="Access Logo"></div>
-<div class="muted">
 
+        function buildPages(items, sectionTitle) {
+            const pages = [];
+            for (let i = 0; i < items.length; i += maxRowsPerPage) {
+                const slice = items.slice(i, i + maxRowsPerPage);
+                pages.push({
+                    sectionTitle,
+                    rowsHtml: buildRows(slice, i),
+                });
+            }
+            return pages;
+        }
+
+        // 分页：Tools and Equipment 先，Consumables 后
+        const pages = [
+            ...buildPages(toolsAndEquipment, 'Tools and Equipment'),
+            ...buildPages(consumables, 'Consumables'),
+        ];
+
+        const totalPages = pages.length || 1;
+        const time = new Date().toLocaleString();
+
+        function headerTableHtml() {
+            return `
 <table class="header-table">
 <thead>
   <tr>
     <th style="width:15%">Date:</th>
-    <th style="width:35%"></th>
+    <th style="width:35%">${headerInfo.date || ''}</th>
     <th style="width:15%">Job Code:</th>
-    <th style="width:35%"></th>
+    <th style="width:35%">${headerInfo.jobCode || ''}</th>
   </tr>
 </thead>
 <tbody>
   <tr>
     <td>Attn:</td>
-    <td></td>
+    <td>${headerInfo.attn || ''}</td>
     <td>Delivery Date:</td>
-    <td></td>
+    <td>${headerInfo.deliveryDate || ''}</td>
   </tr>
   <tr>
     <td>From:</td>
-    <td></td>
+    <td>${headerInfo.from || ''}</td>
     <td>Deliver To:</td>
-    <td></td>
+    <td>${headerInfo.deliverTo || ''}</td>
   </tr>
   <tr>
     <td>Title:</td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td colspan="3">${headerInfo.title || ''}</td>
   </tr>
 </tbody>
-</table>
+</table>`;
+        }
 
-${toolsAndEquipment.length > 0 ? `
-<h3>Tools and Equipment</h3>
-<table>
-<thead><tr><th style="width:8%">#</th><th style="width:42%">Item</th><th style="width:20%">Tag No</th><th style="width:10%">Qty</th><th style="width:20%">Returned Date</th></tr></thead>
-<tbody>${toolsRows}</tbody>
-</table>
-` : ''}
+        function itemsTableHtml(sectionTitle, rowsHtml) {
+            return `
+<h3>${sectionTitle}</h3>
+<table class="items-table">
+<thead><tr>
+  <th style="width:8%">#</th>
+  <th style="width:42%">Item</th>
+  <th style="width:20%">Tag No</th>
+  <th style="width:10%">Qty</th>
+  <th style="width:20%">Returned Date</th>
+</tr></thead>
+<tbody>${rowsHtml}</tbody>
+</table>`;
+        }
 
-${consumables.length > 0 ? `
-<h3>Consumables</h3>
-<table>
-<thead><tr><th style="width:8%">#</th><th style="width:42%">Item</th><th style="width:20%">Tag No</th><th style="width:10%">Qty</th><th style="width:20%">Returned Date</th></tr></thead>
-<tbody>${consumablesRows}</tbody>
-</table>
-` : ''}
+        const pagesHtml = pages.map((p, idx) => {
+            const pageNo = idx + 1;
+            return `
+<div class="page">
+  <div class="page-top">
+    <div class="logo-header"><img src="access logo.png" alt="Access Logo"></div>
+    <div class="page-meta">
+      <div class="page-indicator">Page ${pageNo} of ${totalPages}</div>
+      <div class="print-time">Print time: ${time}</div>
+    </div>
+  </div>
+  ${headerTableHtml()}
+  ${itemsTableHtml(p.sectionTitle, p.rowsHtml)}
+</div>`;
+        }).join('');
 
+        const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>TEM List</title>
+<style>
+@page { size: A4; }
+html, body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
+body { font-family: Arial, Helvetica, sans-serif; }
+
+/* 固定字体为 14pt（Word 14pt） */
+body, table, th, td, h3, .page-indicator, .print-time { font-size: 14pt; }
+
+.page { box-sizing: border-box; }
+.page-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.logo-header img { height: 52px; width: auto; display: block; }
+.page-meta { text-align: right; }
+.page-indicator { font-weight: 700; color: #111; }
+.print-time { color: #555; font-size: 11pt; }
+
+h3 { margin: 10px 0 8px; font-weight: 700; }
+
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th, td { border: 1px solid #333; padding: 4px 6px; text-align: left; line-height: 1.25; }
+th { background-color: #f0f0f0; font-weight: 700; }
+.header-table { margin-bottom: 10px; }
+.items-table { margin-bottom: 0; }
+.items-table thead { display: table-header-group; }
+.items-table tr { page-break-inside: avoid; }
+
+@media print {
+  button { display: none; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+}
+</style>
+</head>
+<body>
+${pagesHtml}
 <button onclick="window.print()">打印</button>
 </body></html>`;
         const win = window.open('', '_blank');
@@ -804,6 +977,12 @@ ${consumables.length > 0 ? `
     renderCart();
     const printBtn = document.getElementById('printBtn');
     if (printBtn) printBtn.addEventListener('click', printCart);
+    const headerBtn = document.getElementById('headerInfoBtn');
+    if (headerBtn) headerBtn.addEventListener('click', openHeaderModal);
+    const headerCancelBtn = document.getElementById('headerCancelBtn');
+    if (headerCancelBtn) headerCancelBtn.addEventListener('click', closeHeaderModal);
+    const headerSaveBtn = document.getElementById('headerSaveBtn');
+    if (headerSaveBtn) headerSaveBtn.addEventListener('click', saveHeaderModal);
     </script>
 </body>
 </html>
