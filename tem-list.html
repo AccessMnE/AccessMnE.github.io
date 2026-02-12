@@ -103,7 +103,7 @@
     <h1 style="padding: 12px; margin: 0;">TEM List</h1>
     <div class="page">
         <aside class="sidebar">
-            <div class="section-title">一级分类</div>
+            <div class="section-title">Category</div>
             <ul class="menu" id="level1Menu">
                 <li><button class="menu-button" data-cat="power tools">power tools</button></li>
                 <li>
@@ -134,30 +134,30 @@
         <main class="content">
             <div class="toolbar">
                 <span class="tag" id="activePath">power tools</span>
-                <span class="muted">单个 item 你可以替换为实际名称；双击即可下单。</span>
+                <span class="muted">Double click to add to cart</span>
             </div>
             <div class="columns">
                 <section class="column">
                     <h3>tools and equipment</h3>
                     <div id="toolsGrid" class="grid"></div>
-                    <div id="toolsEmpty" class="empty" style="display:none;">该分类暂无物品，请添加或替换占位项。</div>
+                    <div id="toolsEmpty" class="empty" style="display:none;">N/A</div>
                 </section>
                 <section class="column" id="consumablesSection">
                     <h3>consumable</h3>
                     <div id="consumablesGrid" class="grid"></div>
-                    <div id="consumablesEmpty" class="empty" style="display:none;">暂无耗材。</div>
+                    <div id="consumablesEmpty" class="empty" style="display:none;">N/A</div>
                 </section>
             </div>
         </main>
 
         <aside class="cart">
-            <h3 class="cart-title">小提示</h3>
-            <div class="muted">可多选物品，支持推荐高亮；完成后右侧主区域可打印清单。</div>
-            <div id="cartEmpty" class="empty" style="margin-top:10px;">订单为空，双击左侧物品加入。</div>
+            <h3 class="cart-title">tips</h3>
+            <div class="muted">Allow multiple selection,support highlight recommendation</div>
+            <div id="cartEmpty" class="empty" style="margin-top:10px;">Cart is empty</div>
             <ul id="cartList" class="cart-list"></ul>
             <div class="toolbar" style="margin-top:10px;">
                 <button id="headerInfoBtn" type="button">Header Info</button>
-                <button id="printBtn" type="button">打印订单</button>
+                <button id="printBtn" type="button">Print cart</button>
             </div>
         </aside>
     </div>
@@ -512,7 +512,7 @@ Cleaning & Misc: sponge, cloth, scouring, canvas, wrapping, rubbish, gunny, seal
         if (node.sub) {
             if (!activeSubcategory) {
                 const e = document.getElementById('toolsEmpty');
-                if (e) { e.style.display = 'block'; e.textContent = '请选择二级分类以查看物品'; }
+                if (e) { e.style.display = 'block'; e.textContent = 'Please select a subcategory to view items'; }
                 return;
             }
             items = node.sub[activeSubcategory] || [];
