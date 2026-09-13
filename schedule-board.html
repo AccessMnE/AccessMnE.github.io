@@ -4,17 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>排班表 - Work Schedule Board</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="schedule-board.css" />
   </head>
-  <body>
-    <header class="app-header">
+  <body class="schedule-board-page">
+    <header class="app-header no-print">
       <div class="header-content">
         <div class="header-title-section">
           <h1>Work Schedule Board</h1>
           <p class="header-subtitle">高效管理 Job Code 与一周排班</p>
         </div>
         <nav class="actions" aria-label="主要操作">
-          <div class="action-group primary-actions">
+          <div class="action-group primary-actions" role="group" aria-label="排班操作">
             <button id="add-row" aria-label="添加新的 Job Code 行">
               <span class="button-icon">+</span>
               <span class="button-text">添加 Job Code 行</span>
@@ -24,6 +26,7 @@
             </button>
           </div>
           <div class="export-controls" role="group" aria-label="导出控制">
+            <span class="export-label" aria-hidden="true">导出</span>
             <div class="export-field">
               <label for="export-day" class="sr-only">选择星期</label>
               <select id="export-day" title="选择星期" aria-label="选择要导出的星期">
@@ -38,13 +41,13 @@
             </div>
             <div class="export-field">
               <label for="export-date" class="sr-only">输入日期</label>
-              <input id="export-date" type="text" placeholder="输入日期 (如: 2025-08-12)" aria-label="输入导出日期" />
+              <input id="export-date" type="text" placeholder="日期 如 2025-08-12" aria-label="输入导出日期" />
             </div>
             <button id="export-btn" aria-label="导出排班文本">
               <span class="button-text">导出文本</span>
             </button>
           </div>
-          <div class="action-group navigation-actions">
+          <div class="action-group navigation-actions" role="group" aria-label="导航">
             <button class="home-btn" onclick="window.location.href='index.html'" aria-label="返回首页">
               <span class="button-text">Home</span>
             </button>
@@ -54,7 +57,7 @@
     </header>
 
     <!-- 可拖拽的 Worker Quick Access 侧边栏 -->
-    <aside id="worker-sidebar" class="worker-sidebar" role="complementary" aria-label="Worker Quick Access">
+    <aside id="worker-sidebar" class="worker-sidebar no-print" role="complementary" aria-label="Worker Quick Access">
       <div class="worker-sidebar-header">
         <h3>Worker Quick Access</h3>
         <button class="sidebar-toggle" id="sidebar-toggle" aria-label="折叠/展开侧边栏">−</button>
@@ -72,6 +75,7 @@
         </div>
         <div class="worker-sidebar-footer">
           <span id="worker-total" aria-live="polite" aria-atomic="true">总数：0</span>
+          <span class="worker-hint">拖到右侧格子分配</span>
         </div>
       </div>
       <div class="sidebar-drag-handle" id="sidebar-drag-handle" aria-label="拖拽侧边栏"></div>
@@ -79,35 +83,38 @@
 
     <main class="layout">
       <section class="board" role="region" aria-label="排班表">
-        <div class="board-header">
+        <div class="print-only print-masthead" aria-hidden="true">
+          <h1>一周排班表 · Weekly Schedule</h1>
+        </div>
+        <div class="board-header no-print">
           <h2 class="board-title">一周排班表</h2>
-          <p class="board-description">为每个 Job Code 分配 Worker 到对应日期</p>
+          <p class="board-description">从左侧拖拽 Worker 到对应日期格子；同一天不可重复分配</p>
         </div>
         <div class="table-container">
           <div class="table-wrapper">
             <table id="schedule-table" role="table" aria-label="工作排班表">
               <colgroup>
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
-                <col style="width:11.11%" />
+                <col class="col-job-w" />
+                <col class="col-day-w" />
+                <col class="col-day-w" />
+                <col class="col-day-w" />
+                <col class="col-day-w" />
+                <col class="col-day-w" />
+                <col class="col-day-w" />
+                <col class="col-day-w" />
+                <col class="col-op-w" />
               </colgroup>
               <thead>
                 <tr>
                   <th class="col-job" scope="col">Job Code</th>
-                  <th scope="col">Mon</th>
-                  <th scope="col">Tue</th>
-                  <th scope="col">Wedy</th>
-                  <th scope="col">Thu</th>
-                  <th scope="col">Fri</th>
-                  <th scope="col">Sat</th>
-                  <th scope="col">Sun</th>
-                  <th scope="col">Operation</th>
+                  <th class="col-day" scope="col">Mon</th>
+                  <th class="col-day" scope="col">Tue</th>
+                  <th class="col-day" scope="col">Wed</th>
+                  <th class="col-day" scope="col">Thu</th>
+                  <th class="col-day" scope="col">Fri</th>
+                  <th class="col-day" scope="col">Sat</th>
+                  <th class="col-day" scope="col">Sun</th>
+                  <th class="col-op no-print" scope="col">Operation</th>
                 </tr>
               </thead>
               <tbody id="table-body" role="rowgroup"></tbody>
@@ -117,15 +124,15 @@
       </section>
     </main>
 
-    <footer class="app-footer" role="contentinfo">
+    <footer class="app-footer no-print" role="contentinfo">
       <div class="footer-content">
         <span>数据保存在浏览器本地（LocalStorage）。</span>
-        <span class="footer-hint">数据自动保存，无需手动操作</span>
+        <span class="footer-hint">数据自动保存，无需手动操作 · 打印请用 Ctrl+P（A4 横向）</span>
       </div>
     </footer>
 
     <!-- 导出弹窗 -->
-    <div id="export-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+    <div id="export-modal" class="modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
       <div class="modal-backdrop" aria-hidden="true"></div>
       <div class="modal-content">
         <div class="modal-header">
@@ -150,6 +157,4 @@
     <script src="main.js"></script>
     <script src="sidebar-drag.js"></script>
   </body>
-  </html>
-
-
+</html>

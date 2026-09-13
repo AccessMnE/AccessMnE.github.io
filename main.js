@@ -218,12 +218,13 @@
       DAYS.forEach((day) => {
         const td = document.createElement("td");
         const dropArea = document.createElement("div");
-        dropArea.className = "droppable";
+        const assigned = row.assignments[day];
+        dropArea.className = assigned.length === 0 ? "droppable is-empty" : "droppable";
 
         // badges
         const badges = document.createElement("div");
         badges.className = "cell-badges";
-        row.assignments[day].forEach((w) => {
+        assigned.forEach((w) => {
           badges.appendChild(createBadge(w, () => {
             row.assignments[day] = row.assignments[day].filter((x) => x !== w);
             persist();
@@ -234,7 +235,7 @@
         // subtotal
         const subtotal = document.createElement("div");
         subtotal.className = "cell-subtotal";
-        subtotal.textContent = `小计：${row.assignments[day].length}`;
+        subtotal.textContent = `小计：${assigned.length}`;
 
         dropArea.appendChild(badges);
         dropArea.appendChild(subtotal);
