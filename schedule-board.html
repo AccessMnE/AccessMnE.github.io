@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>排班表 - Work Schedule Board</title>
+    <title>Work Schedule Board</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="schedule-board.css" />
@@ -14,32 +14,32 @@
         <div class="header-title-section">
           <h1>Work Schedule Board</h1>
           <p class="header-subtitle">
-            一周排班 · 当前：<span id="board-mode-label">Planning</span>
+            Weekly schedule · Mode: <span id="board-mode-label">Planning</span>
           </p>
         </div>
-        <nav class="actions" aria-label="主要操作">
+        <nav class="actions" aria-label="Main actions">
           <div class="action-group mode-tabs" role="group" aria-label="Planning / Actual">
             <button type="button" class="mode-tab is-active" data-board-mode="planning">Planning</button>
             <button type="button" class="mode-tab" data-board-mode="actual">Actual</button>
-            <button type="button" id="copy-to-actual" title="用 Planning 覆盖 Actual">复制到 Actual</button>
+            <button type="button" id="copy-to-actual" title="Overwrite Actual with Planning">Copy to Actual</button>
           </div>
-          <div class="action-group primary-actions" role="group" aria-label="排班操作">
-            <button id="add-row" aria-label="添加新的 Job Code 行">
+          <div class="action-group primary-actions" role="group" aria-label="Schedule actions">
+            <button id="add-row" type="button" aria-label="Add Job Code row">
               <span class="button-icon">+</span>
-              <span class="button-text">添加 Job Code 行</span>
+              <span class="button-text">Add Job Code</span>
             </button>
-            <button id="open-daily" type="button" aria-label="打开当日详情">
+            <button id="open-daily" type="button" aria-label="Open daily view">
               <span class="button-text">Daily View</span>
             </button>
-            <button id="clear-all" class="danger" aria-label="清空所有数据">
-              <span class="button-text">清空数据</span>
+            <button id="clear-all" type="button" class="danger" aria-label="Clear all data">
+              <span class="button-text">Clear All</span>
             </button>
           </div>
-          <div class="export-controls" role="group" aria-label="导出控制">
-            <span class="export-label" aria-hidden="true">导出</span>
+          <div class="export-controls" role="group" aria-label="Export">
+            <span class="export-label" aria-hidden="true">Export</span>
             <div class="export-field">
-              <label for="export-day" class="sr-only">选择星期</label>
-              <select id="export-day" title="选择星期" aria-label="选择要导出的星期">
+              <label for="export-day" class="sr-only">Select day</label>
+              <select id="export-day" title="Select day" aria-label="Select export day">
                 <option value="mon">Mon</option>
                 <option value="tue">Tue</option>
                 <option value="wed">Wed</option>
@@ -50,16 +50,16 @@
               </select>
             </div>
             <div class="export-field">
-              <label for="export-date" class="sr-only">输入日期</label>
-              <input id="export-date" type="text" placeholder="日期 如 14/9/26" aria-label="输入导出日期" />
+              <label for="export-date" class="sr-only">Date</label>
+              <input id="export-date" type="text" placeholder="Date e.g. 14/9/26" aria-label="Export date" />
             </div>
-            <button id="export-btn" aria-label="导出排班文本">
-              <span class="button-text">导出文本</span>
+            <button id="export-btn" type="button" aria-label="Export text">
+              <span class="button-text">Export Text</span>
             </button>
           </div>
-          <div class="action-group navigation-actions" role="group" aria-label="导航">
-            <button class="home-btn" onclick="window.location.href='index.html'" aria-label="返回首页">
-              <span class="button-text">Home</span>
+          <div class="action-group navigation-actions" role="group" aria-label="Navigation">
+            <button type="button" class="home-btn" onclick="window.location.href='index.html'" aria-label="Back to Home" title="Home">
+              ← Home
             </button>
           </div>
         </nav>
@@ -69,51 +69,51 @@
     <aside id="worker-sidebar" class="worker-sidebar no-print" role="complementary" aria-label="Worker Quick Access">
       <div class="worker-sidebar-header">
         <h3>Worker Quick Access</h3>
-        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="折叠/展开侧边栏">−</button>
+        <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse or expand sidebar">−</button>
       </div>
       <div class="worker-sidebar-content">
-        <div class="worker-input" role="group" aria-label="添加 Worker">
-          <label for="worker-name" class="sr-only">Worker 名称</label>
-          <input id="worker-name" type="text" placeholder="输入 worker 名称" aria-label="输入 worker 名称" />
-          <button id="add-worker" aria-label="添加 worker">
-            <span class="button-text">添加</span>
+        <div class="worker-input" role="group" aria-label="Add worker">
+          <label for="worker-name" class="sr-only">Worker name</label>
+          <input id="worker-name" type="text" placeholder="Worker name" aria-label="Worker name" />
+          <button id="add-worker" type="button" aria-label="Add worker">
+            <span class="button-text">Add</span>
           </button>
         </div>
         <div class="worker-list-container">
-          <ul id="worker-list" class="worker-list" role="list" aria-label="Worker 列表"></ul>
+          <ul id="worker-list" class="worker-list" role="list" aria-label="Worker list"></ul>
         </div>
 
         <div class="group-section">
-          <h4 class="sidebar-section-title">Groups（仅安排用）</h4>
-          <div class="group-create" role="group" aria-label="创建 Group">
-            <input id="group-name" type="text" placeholder="组名 如 NAKA" aria-label="Group 名称" />
+          <h4 class="sidebar-section-title">Groups (planning aid)</h4>
+          <div class="group-create" role="group" aria-label="Create group">
+            <input id="group-name" type="text" placeholder="Name e.g. NAKA" aria-label="Group name" />
             <button id="create-group" type="button">Create Group</button>
           </div>
-          <p class="group-hint">勾选上方工人 → Create；拖 Group 到格子会展开成个人</p>
-          <ul id="group-list" class="group-list" role="list" aria-label="Group 列表"></ul>
+          <p class="group-hint">Tick workers above → Create. Drag a group onto a cell to expand into people.</p>
+          <ul id="group-list" class="group-list" role="list" aria-label="Group list"></ul>
         </div>
 
         <div class="worker-sidebar-footer">
-          <span id="worker-total" aria-live="polite" aria-atomic="true">总数：0</span>
-          <span class="worker-hint">拖到右侧格子 · Cuti 行放休假</span>
+          <span id="worker-total" aria-live="polite" aria-atomic="true">Total: 0</span>
+          <span class="worker-hint">Drag to cells · use Cuti row for leave</span>
         </div>
       </div>
-      <div class="sidebar-drag-handle" id="sidebar-drag-handle" aria-label="拖拽侧边栏"></div>
+      <div class="sidebar-drag-handle" id="sidebar-drag-handle" aria-label="Resize sidebar"></div>
     </aside>
 
     <main class="layout">
-      <section class="board" role="region" aria-label="排班表">
+      <section class="board" role="region" aria-label="Schedule board">
         <div class="print-only print-masthead" aria-hidden="true">
-          <h1>一周排班表 · Weekly Schedule</h1>
+          <h1>Weekly Schedule</h1>
         </div>
         <div class="board-header no-print">
-          <h2 class="board-title">一周排班表</h2>
-          <p class="board-description">拖拽 Worker / Group；底部 Cuti 行管休假；Daily View 填群发详情</p>
+          <h2 class="board-title">Weekly Schedule</h2>
+          <p class="board-description">Drag workers / groups. Use the Cuti row for leave. Open Daily View for Jadual details.</p>
         </div>
 
-        <div class="coverage-bar no-print" aria-label="人力覆盖">
-          <label class="coverage-day-label" for="coverage-day">对照日</label>
-          <select id="coverage-day" aria-label="选择对照星期">
+        <div class="coverage-bar no-print" aria-label="Manpower coverage">
+          <label class="coverage-day-label" for="coverage-day">Check day</label>
+          <select id="coverage-day" aria-label="Coverage day">
             <option value="mon">Mon</option>
             <option value="tue">Tue</option>
             <option value="wed">Wed</option>
@@ -127,7 +127,7 @@
 
         <div class="table-container">
           <div class="table-wrapper">
-            <table id="schedule-table" role="table" aria-label="工作排班表">
+            <table id="schedule-table" role="table" aria-label="Work schedule">
               <colgroup>
                 <col class="col-job-w" />
                 <col class="col-day-w" />
@@ -161,8 +161,8 @@
 
     <footer class="app-footer no-print" role="contentinfo">
       <div class="footer-content">
-        <span>数据保存在浏览器本地（LocalStorage）。Actual 预留日后写库。</span>
-        <span class="footer-hint">打印 Ctrl+P（A4 横向）</span>
+        <span>Saved in browser LocalStorage. Actual board is ready for a future database.</span>
+        <span class="footer-hint">Print: Ctrl+P (A4 landscape)</span>
       </div>
     </footer>
 
@@ -170,20 +170,20 @@
       <div class="modal-backdrop" aria-hidden="true"></div>
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="export-modal-title">导出文本</h3>
+          <h3 id="export-modal-title">Export Text</h3>
           <div class="spacer"></div>
           <div class="modal-actions">
-            <button id="export-copy" class="copy-btn" aria-label="复制导出文本">
-              <span class="button-text">复制</span>
+            <button id="export-copy" type="button" class="copy-btn" aria-label="Copy export text">
+              <span class="button-text">Copy</span>
             </button>
-            <button id="export-close" class="close-btn" aria-label="关闭弹窗">
-              <span class="button-text">关闭</span>
+            <button id="export-close" type="button" class="close-btn" aria-label="Close">
+              <span class="button-text">Close</span>
             </button>
           </div>
         </div>
         <div class="modal-body">
-          <label for="export-text" class="sr-only">导出文本内容</label>
-          <textarea id="export-text" class="export-text" rows="16" aria-label="导出的排班文本" readonly></textarea>
+          <label for="export-text" class="sr-only">Export text</label>
+          <textarea id="export-text" class="export-text" rows="16" aria-label="Exported schedule text" readonly></textarea>
         </div>
       </div>
     </div>

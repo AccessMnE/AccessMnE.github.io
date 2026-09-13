@@ -94,8 +94,8 @@
     exportCopy.addEventListener("click", () => {
       exportText.select();
       document.execCommand("copy");
-      exportCopy.textContent = "已复制";
-      setTimeout(() => (exportCopy.textContent = "复制"), 1200);
+      exportCopy.textContent = "Copied";
+      setTimeout(() => (exportCopy.textContent = "Copy"), 1200);
     });
   }
 
@@ -106,10 +106,10 @@
 
   if (copyToActualBtn) {
     copyToActualBtn.addEventListener("click", () => {
-      if (!confirm("用当前 Planning 覆盖 Actual 排班？（可再改 Actual）")) return;
+      if (!confirm("Overwrite Actual with the current Planning board?")) return;
       S.copyPlanningToActual(state);
       persist();
-      alert("已复制 Planning → Actual");
+      alert("Copied Planning → Actual");
       if (currentMode() === "actual") {
         renderTable();
         renderCoverage();
@@ -130,7 +130,7 @@
     const name = (workerNameInput.value || "").trim();
     if (!name) return;
     if (state.workers.includes(name)) {
-      alert("该 worker 已存在");
+      alert("This worker already exists");
       return;
     }
     state.workers.push(name);
@@ -154,7 +154,7 @@
       const name = (groupNameInput?.value || "").trim() || "Group";
       const selected = [...document.querySelectorAll(".worker-pick:checked")].map((el) => el.value);
       if (selected.length === 0) {
-        alert("请先勾选要组成一组的 workers");
+        alert("Tick workers first, then Create Group");
         return;
       }
       state.groups.push({
@@ -180,7 +180,7 @@
   });
 
   clearAllBtn.addEventListener("click", () => {
-    if (!confirm("确定清空所有数据？（Planning、Actual、Groups、Cuti）")) return;
+    if (!confirm("Clear ALL data? (Planning, Actual, Groups, Cuti)")) return;
     state.workers = [];
     state.groups = [];
     state.leave = S.emptyDayMap(() => []);
@@ -226,7 +226,7 @@
       pick.type = "checkbox";
       pick.className = "worker-pick";
       pick.value = name;
-      pick.title = "勾选后可 Create Group";
+      pick.title = "Tick to include in Create Group";
       pick.addEventListener("click", (e) => e.stopPropagation());
 
       const span = document.createElement("span");
@@ -234,8 +234,9 @@
       span.textContent = name;
 
       const del = document.createElement("button");
+      del.type = "button";
       del.className = "worker-remove";
-      del.textContent = "删除";
+      del.textContent = "Del";
       del.addEventListener("click", () => {
         S.removeWorkerEverywhere(state, name);
         persist();
@@ -254,7 +255,7 @@
       li.appendChild(del);
       workerList.appendChild(li);
     });
-    workerTotal.textContent = `总数：${state.workers.length}`;
+    workerTotal.textContent = `Total: ${state.workers.length}`;
   }
 
   function renderGroups() {
@@ -263,7 +264,7 @@
     if (!state.groups.length) {
       const empty = document.createElement("li");
       empty.className = "group-empty";
-      empty.textContent = "暂无 group（勾选工人后创建）";
+      empty.textContent = "No groups yet (tick workers to create)";
       groupList.appendChild(empty);
       return;
     }
@@ -280,7 +281,7 @@
       title.textContent = g.name;
       const meta = document.createElement("span");
       meta.className = "group-meta";
-      meta.textContent = `${g.members.length} 人`;
+      meta.textContent = `${g.members.length} pax`;
       info.appendChild(title);
       info.appendChild(meta);
 
@@ -291,7 +292,7 @@
       explodeBtn.type = "button";
       explodeBtn.className = "group-explode";
       explodeBtn.textContent = "Explode";
-      explodeBtn.title = "解散 group（工人保留在列表）";
+      explodeBtn.title = "Dissolve group (workers stay in list)";
       explodeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         g.members.forEach((m) => {
@@ -306,7 +307,7 @@
       const delBtn = document.createElement("button");
       delBtn.type = "button";
       delBtn.className = "group-remove";
-      delBtn.textContent = "删";
+      delBtn.textContent = "Del";
       delBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         state.groups = state.groups.filter((x) => x.id !== g.id);
@@ -354,10 +355,10 @@
   function applyAssignResult(result, day) {
     const msgs = [];
     if (result.skippedLeave.length) {
-      msgs.push(`休假中：${result.skippedLeave.join(", ")}`);
+      msgs.push(`On leave (Cuti): ${result.skippedLeave.join(", ")}`);
     }
     if (result.skippedConflict.length) {
-      msgs.push(`${DAY_LABELS[day]} 已有安排：${result.skippedConflict.join(", ")}`);
+      msgs.push(`Already assigned on ${DAY_LABELS[day]}: ${result.skippedConflict.join(", ")}`);
     }
     if (msgs.length) alert(msgs.join("\n"));
   }
@@ -370,14 +371,23 @@
       const tr = document.createElement("tr");
 
       const jobTd = document.createElement("td");
+      jobTd.className = "col-job-cell";
       const jobInput = document.createElement("input");
+      jobInput.type = "text";
       jobInput.className = "job-input";
-      jobInput.placeholder = "输入 Job Code";
-      jobInput.value = row.jobCode;
-      jobInput.addEventListener("change", () => {
+      jobInput.placeholder = "Job Code";
+      jobInput.autocomplete = "off";
+      jobInput.spellcheck = false;
+      jobInput.value = row.jobCode || "";
+      const saveJobCode = () => {
         row.jobCode = jobInput.value.trim();
         persist();
-      });
+      };
+      jobInput.addEventListener("input", saveJobCode);
+      jobInput.addEventListener("change", saveJobCode);
+      jobInput.addEventListener("mousedown", (e) => e.stopPropagation());
+      jobInput.addEventListener("click", (e) => e.stopPropagation());
+      jobInput.addEventListener("keydown", (e) => e.stopPropagation());
       jobTd.appendChild(jobInput);
       tr.appendChild(jobTd);
 
@@ -402,7 +412,7 @@
 
         const subtotal = document.createElement("div");
         subtotal.className = "cell-subtotal";
-        subtotal.textContent = `小计：${assigned.length}`;
+        subtotal.textContent = `Count: ${assigned.length}`;
 
         dropArea.appendChild(badges);
         dropArea.appendChild(subtotal);
@@ -424,8 +434,9 @@
       const actionsTd = document.createElement("td");
       actionsTd.className = "row-actions";
       const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
       removeBtn.className = "remove-row";
-      removeBtn.textContent = "删除行";
+      removeBtn.textContent = "Delete";
       removeBtn.addEventListener("click", () => removeRow(row.id));
       actionsTd.appendChild(removeBtn);
       tr.appendChild(actionsTd);
@@ -439,7 +450,7 @@
 
     const cutiLabelTd = document.createElement("td");
     cutiLabelTd.className = "col-job cuti-label";
-    cutiLabelTd.innerHTML = "<strong>Cuti</strong><span class=\"cuti-hint\">休假</span>";
+    cutiLabelTd.innerHTML = '<strong>Cuti</strong><span class="cuti-hint">Leave</span>';
     cutiTr.appendChild(cutiLabelTd);
 
     DAYS.forEach((day) => {
@@ -464,22 +475,19 @@
 
       const subtotal = document.createElement("div");
       subtotal.className = "cell-subtotal";
-      subtotal.textContent = assigned.length ? `Cuti：${assigned.length}` : "";
+      subtotal.textContent = assigned.length ? `Leave: ${assigned.length}` : "";
 
       dropArea.appendChild(badges);
       dropArea.appendChild(subtotal);
 
       bindDroppable(dropArea, (names) => {
         let changed = false;
-        const notes = [];
         names.forEach((name) => {
-          // Remove from job assignments that day if present
           const onJob = boardRows.some((r) => (r.assignments[day] || []).includes(name));
           if (onJob) {
             boardRows.forEach((r) => {
               r.assignments[day] = (r.assignments[day] || []).filter((x) => x !== name);
             });
-            notes.push(`${name} 已从当日 Job 移出`);
             changed = true;
           }
           if (!(state.leave[day] || []).includes(name)) {
@@ -492,9 +500,6 @@
           renderTable();
           renderCoverage();
         }
-        if (notes.length) {
-          /* silent ok — moved from job to cuti */
-        }
       });
 
       td.appendChild(dropArea);
@@ -503,7 +508,7 @@
 
     const cutiActions = document.createElement("td");
     cutiActions.className = "row-actions";
-    cutiActions.innerHTML = '<span class="cuti-fixed">固定</span>';
+    cutiActions.innerHTML = '<span class="cuti-fixed">Fixed</span>';
     cutiTr.appendChild(cutiActions);
     tableBody.appendChild(cutiTr);
   }
@@ -532,8 +537,8 @@
     summary.className = "coverage-summary";
     summary.innerHTML =
       `<strong>${DAY_LABELS[day]}</strong> · ` +
-      `名单 ${c.total} · 已排 ${c.assignedCount} · Cuti ${c.leaveCount} · ` +
-      `<span class="coverage-gap">未排 ${c.unassignedCount}</span>`;
+      `Roster ${c.total} · Assigned ${c.assignedCount} · Cuti ${c.leaveCount} · ` +
+      `<span class="coverage-gap">Unassigned ${c.unassignedCount}</span>`;
     coveragePanel.appendChild(summary);
 
     if (c.unassigned.length) {
@@ -541,7 +546,7 @@
       list.className = "coverage-unassigned";
       const label = document.createElement("div");
       label.className = "coverage-label";
-      label.textContent = "推荐尚未安排：";
+      label.textContent = "Still free:";
       list.appendChild(label);
       c.unassigned.forEach((name) => {
         const chip = document.createElement("button");
@@ -549,7 +554,7 @@
         chip.className = "coverage-chip";
         chip.textContent = name;
         chip.draggable = true;
-        chip.title = "可拖到格子；点击复制名字";
+        chip.title = "Drag to a cell, or click to copy name";
         chip.addEventListener("dragstart", (e) => {
           S.setDragPayload(e.dataTransfer, { type: "worker", name });
         });
@@ -568,14 +573,14 @@
     } else if (c.total > 0) {
       const ok = document.createElement("div");
       ok.className = "coverage-ok";
-      ok.textContent = "该日所有 worker 已安排或休假 ✓";
+      ok.textContent = "Everyone is assigned or on leave ✓";
       coveragePanel.appendChild(ok);
     }
 
     if (c.leave.length) {
       const leaveBox = document.createElement("div");
       leaveBox.className = "coverage-leave";
-      leaveBox.textContent = `Cuti：${c.leave.join(", ")}`;
+      leaveBox.textContent = `Cuti: ${c.leave.join(", ")}`;
       coveragePanel.appendChild(leaveBox);
     }
   }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,7 +13,7 @@
     <header class="day-header">
       <div class="day-header-main">
         <h1>Daily View · Jadual Kerja</h1>
-        <p class="day-sub">填写群发模板详情 · 工人名单来自周排班</p>
+        <p class="day-sub">Fill WhatsApp template details · crew list comes from the weekly board</p>
       </div>
       <div class="day-toolbar">
         <label>
@@ -24,28 +24,28 @@
           </select>
         </label>
         <label>
-          Hari
+          Day
           <select id="day-select">
-            <option value="mon">Isnin</option>
-            <option value="tue">Selasa</option>
-            <option value="wed">Rabu</option>
-            <option value="thu">Khamis</option>
-            <option value="fri">Jumaat</option>
-            <option value="sat">Sabtu</option>
-            <option value="sun">Ahad</option>
+            <option value="mon">Monday</option>
+            <option value="tue">Tuesday</option>
+            <option value="wed">Wednesday</option>
+            <option value="thu">Thursday</option>
+            <option value="fri">Friday</option>
+            <option value="sat">Saturday</option>
+            <option value="sun">Sunday</option>
           </select>
         </label>
-        <button type="button" id="day-save">保存</button>
-        <button type="button" id="day-export">复制群发文本</button>
-        <button type="button" class="ghost" id="day-back">回周视图</button>
+        <button type="button" id="day-save">Save</button>
+        <button type="button" id="day-export">Copy Jadual Text</button>
+        <button type="button" class="ghost" id="day-back">← Weekly Board</button>
       </div>
     </header>
 
     <main class="day-layout">
-      <section class="day-meta cardish" aria-label="当日抬头">
+      <section class="day-meta cardish" aria-label="Day header">
         <div class="field-grid">
           <label>
-            日期（如 14/9/26）
+            Date (e.g. 14/9/26)
             <input id="meta-date" type="text" placeholder="14/9/26" />
           </label>
           <label>
@@ -58,11 +58,11 @@
           </label>
         </div>
         <label class="full">
-          工时说明（多行）
+          Time notes (multi-line)
           <textarea id="meta-time" rows="2" placeholder="PGEO / Volac / Bahru / IKD - 8.30am-6.30pm&#10;Site Lain - 8.00am-6.00pm"></textarea>
         </label>
         <label class="full">
-          开头备注（如 Masuk Access 6 PAGI）
+          Preamble (e.g. Masuk Access 6 PAGI)
           <input id="meta-preamble" type="text" placeholder="Masuk Access 6 PAGI" />
         </label>
         <label class="full">
@@ -71,21 +71,21 @@
         </label>
       </section>
 
-      <section class="day-jobs" aria-label="当日 Job 详情">
-        <h2>当日 Job（来自周表，可补站点与说明）</h2>
+      <section class="day-jobs" aria-label="Job details">
+        <h2>Jobs today (from weekly board — add site &amp; description)</h2>
         <div id="jobs-editor"></div>
-        <p id="jobs-empty" class="jobs-empty hidden">这一天还没有安排任何人。请先在周视图拖拽分配。</p>
+        <p id="jobs-empty" class="jobs-empty hidden">No one assigned for this day yet. Assign people on the weekly board first.</p>
       </section>
 
-      <section class="day-side" aria-label="覆盖与休假">
+      <section class="day-side" aria-label="Coverage and leave">
         <div id="day-coverage" class="day-coverage"></div>
         <div id="day-cuti" class="day-cuti"></div>
       </section>
 
-      <section class="day-preview cardish" aria-label="预览">
+      <section class="day-preview cardish" aria-label="Preview">
         <div class="preview-head">
-          <h2>群发预览</h2>
-          <button type="button" id="day-refresh-preview" class="ghost">刷新预览</button>
+          <h2>Jadual preview</h2>
+          <button type="button" id="day-refresh-preview" class="ghost">Refresh</button>
         </div>
         <pre id="day-preview-text" class="day-preview-text"></pre>
       </section>

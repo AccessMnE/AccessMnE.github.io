@@ -110,25 +110,25 @@
       block.innerHTML = `
         <header class="job-block-head">
           <span class="job-index">${index + 1})</span>
-          <span class="job-code-tag">${escapeHtml(row.jobCode || "(无 Job Code)")}</span>
-          <span class="job-count">${workers.length} 人</span>
+          <span class="job-code-tag">${escapeHtml(row.jobCode || "(no Job Code)")}</span>
+          <span class="job-count">${workers.length} pax</span>
         </header>
         <label>
-          站点 / 标题（如 Naka Engineering @ Ladang Pasir Logok）
+          Site / title (e.g. Naka Engineering @ Ladang Pasir Logok)
           <input class="job-site" type="text" value="${escapeAttr(detail.siteName)}" />
         </label>
         <label>
-          工作内容（如 Plastic Piping）
+          Work description (e.g. Plastic Piping)
           <input class="job-desc" type="text" value="${escapeAttr(detail.description)}" />
         </label>
         <div class="job-workers">
-          <div class="job-workers-label">Workers（可备注，如 masuk Access 8 PAGI）</div>
+          <div class="job-workers-label">Workers (optional note, e.g. masuk Access 8 PAGI)</div>
           ${workers
             .map((w) => {
               const note = detail.workerNotes[w] || "";
               return `<div class="worker-note-row">
                 <span class="worker-note-name">- ${escapeHtml(w)}</span>
-                <input class="worker-note-input" data-worker="${escapeAttr(w)}" type="text" placeholder="备注可选" value="${escapeAttr(note)}" />
+                <input class="worker-note-input" data-worker="${escapeAttr(w)}" type="text" placeholder="Optional note" value="${escapeAttr(note)}" />
               </div>`;
             })
             .join("")}
@@ -141,16 +141,16 @@
   function renderCoverage() {
     const c = S.coverageForDay(state, day, mode);
     dayCoverage.innerHTML =
-      `<strong>人力对照</strong><br>` +
-      `名单 ${c.total} · 已排 ${c.assignedCount} · Cuti ${c.leaveCount} · 未排 ${c.unassignedCount}` +
+      `<strong>Manpower check</strong><br>` +
+      `Roster ${c.total} · Assigned ${c.assignedCount} · Cuti ${c.leaveCount} · Unassigned ${c.unassignedCount}` +
       (c.unassigned.length
-        ? `<div class="day-unassigned">未排：${c.unassigned.map(escapeHtml).join(", ")}</div>`
-        : `<div class="day-ok">全部已覆盖</div>`);
+        ? `<div class="day-unassigned">Unassigned: ${c.unassigned.map(escapeHtml).join(", ")}</div>`
+        : `<div class="day-ok">All covered</div>`);
 
     const leave = state.leave[day] || [];
     dayCuti.innerHTML = leave.length
       ? `<strong>Cuti</strong><ul>${leave.map((w) => `<li>${escapeHtml(w)}</li>`).join("")}</ul>`
-      : `<strong>Cuti</strong><p class="muted">无人休假</p>`;
+      : `<strong>Cuti</strong><p class="muted">No one on leave</p>`;
   }
 
   function renderPreview() {
@@ -196,8 +196,8 @@
   document.getElementById("day-save").addEventListener("click", () => {
     saveAll();
     const btn = document.getElementById("day-save");
-    btn.textContent = "已保存";
-    setTimeout(() => (btn.textContent = "保存"), 1000);
+    btn.textContent = "Saved";
+    setTimeout(() => (btn.textContent = "Save"), 1000);
   });
 
   document.getElementById("day-export").addEventListener("click", async () => {
@@ -207,10 +207,10 @@
     try {
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById("day-export");
-      btn.textContent = "已复制";
-      setTimeout(() => (btn.textContent = "复制群发文本"), 1200);
+      btn.textContent = "Copied";
+      setTimeout(() => (btn.textContent = "Copy Jadual Text"), 1200);
     } catch {
-      prompt("复制以下文本：", text);
+      prompt("Copy this text:", text);
     }
   });
 

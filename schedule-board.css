@@ -165,13 +165,26 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 }
 
 .schedule-board-page .home-btn {
-  padding: 7px 20px;
+  padding: 7px 16px;
   border-radius: var(--radius-sm);
+  background: #fff !important;
+  color: var(--primary) !important;
+  border: 1.5px solid var(--primary) !important;
+  box-shadow: none;
+  font-weight: 800;
+  min-width: 4.5em;
+}
+
+.schedule-board-page .home-btn .button-text {
+  color: inherit;
+  display: inline-block;
 }
 
 .schedule-board-page .home-btn:hover,
 .schedule-board-page .home-btn:focus-visible {
   transform: none;
+  background: var(--primary-light) !important;
+  color: var(--primary-hover) !important;
 }
 
 .schedule-board-page .export-controls select,
@@ -473,7 +486,7 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 }
 
 .schedule-board-page .cuti-drop.is-empty::before {
-  content: "拖入 Cuti";
+  content: "Drop leave";
   color: #fb923c;
 }
 
@@ -691,12 +704,25 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
   background: #eff6ff;
 }
 
+.schedule-board-page .col-job-cell {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+  vertical-align: middle;
+}
+
 .schedule-board-page .job-input {
   width: 100%;
   padding: 7px 10px;
   border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 0.92em;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  background: #fff;
+  color: #0f172a;
+  border: 1px solid var(--border);
 }
 
 .schedule-board-page .job-input:focus {
@@ -724,7 +750,7 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 }
 
 .schedule-board-page .droppable.is-empty::before {
-  content: "拖入 Worker";
+  content: "Drop worker";
   display: block;
   font-size: 0.75em;
   font-weight: 500;
