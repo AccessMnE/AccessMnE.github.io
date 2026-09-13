@@ -1,0 +1,261 @@
+/* Daily Jadual Kerja page */
+
+body.schedule-day-page {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 100% 70% at 0% 0%, #dbeafe 0%, transparent 55%),
+    #f1f5f9;
+  color: #0f172a;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+}
+
+.schedule-day-page .day-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #cbd5e1;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.schedule-day-page .day-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.45rem;
+}
+
+.schedule-day-page .day-sub {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.schedule-day-page .day-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.schedule-day-page .day-toolbar label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.schedule-day-page .day-toolbar select,
+.schedule-day-page .day-toolbar button,
+.schedule-day-page input,
+.schedule-day-page textarea {
+  font: inherit;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: #fff;
+}
+
+.schedule-day-page .day-toolbar button {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.schedule-day-page .day-toolbar button.ghost,
+.schedule-day-page button.ghost {
+  background: #fff;
+  color: #1e40af;
+  border-color: #93c5fd;
+}
+
+.schedule-day-page .day-layout {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 16px 40px;
+  display: grid;
+  gap: 16px;
+}
+
+.schedule-day-page .cardish {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.schedule-day-page .field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.schedule-day-page label.full,
+.schedule-day-page .day-meta > label,
+.schedule-day-page .job-block label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.schedule-day-page .day-jobs h2,
+.schedule-day-page .preview-head h2 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.schedule-day-page .job-block {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.schedule-day-page .job-block-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.schedule-day-page .job-index {
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.schedule-day-page .job-code-tag {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.schedule-day-page .job-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.schedule-day-page .job-workers {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.schedule-day-page .job-workers-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.schedule-day-page .worker-note-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 160px) 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.schedule-day-page .worker-note-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.schedule-day-page .jobs-empty {
+  color: #94a3b8;
+  padding: 12px;
+}
+
+.schedule-day-page .hidden {
+  display: none !important;
+}
+
+.schedule-day-page .day-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.schedule-day-page .day-coverage,
+.schedule-day-page .day-cuti {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+}
+
+.schedule-day-page .day-unassigned {
+  margin-top: 6px;
+  color: #b45309;
+  font-weight: 600;
+}
+
+.schedule-day-page .day-ok {
+  margin-top: 6px;
+  color: #047857;
+  font-weight: 600;
+}
+
+.schedule-day-page .muted {
+  color: #94a3b8;
+}
+
+.schedule-day-page .day-cuti ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.schedule-day-page .preview-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedule-day-page .day-preview-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  max-height: 420px;
+  overflow: auto;
+}
+
+@media (max-width: 720px) {
+  .schedule-day-page .field-grid,
+  .schedule-day-page .day-side {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-day-page .worker-note-row {
+    grid-template-columns: 1fr;
+  }
+}

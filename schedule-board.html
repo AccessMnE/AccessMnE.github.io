@@ -8,18 +8,28 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="schedule-board.css" />
   </head>
-  <body class="schedule-board-page">
+  <body class="schedule-board-page" data-board-mode="planning">
     <header class="app-header no-print">
       <div class="header-content">
         <div class="header-title-section">
           <h1>Work Schedule Board</h1>
-          <p class="header-subtitle">高效管理 Job Code 与一周排班</p>
+          <p class="header-subtitle">
+            一周排班 · 当前：<span id="board-mode-label">Planning</span>
+          </p>
         </div>
         <nav class="actions" aria-label="主要操作">
+          <div class="action-group mode-tabs" role="group" aria-label="Planning / Actual">
+            <button type="button" class="mode-tab is-active" data-board-mode="planning">Planning</button>
+            <button type="button" class="mode-tab" data-board-mode="actual">Actual</button>
+            <button type="button" id="copy-to-actual" title="用 Planning 覆盖 Actual">复制到 Actual</button>
+          </div>
           <div class="action-group primary-actions" role="group" aria-label="排班操作">
             <button id="add-row" aria-label="添加新的 Job Code 行">
               <span class="button-icon">+</span>
               <span class="button-text">添加 Job Code 行</span>
+            </button>
+            <button id="open-daily" type="button" aria-label="打开当日详情">
+              <span class="button-text">Daily View</span>
             </button>
             <button id="clear-all" class="danger" aria-label="清空所有数据">
               <span class="button-text">清空数据</span>
@@ -41,7 +51,7 @@
             </div>
             <div class="export-field">
               <label for="export-date" class="sr-only">输入日期</label>
-              <input id="export-date" type="text" placeholder="日期 如 2025-08-12" aria-label="输入导出日期" />
+              <input id="export-date" type="text" placeholder="日期 如 14/9/26" aria-label="输入导出日期" />
             </div>
             <button id="export-btn" aria-label="导出排班文本">
               <span class="button-text">导出文本</span>
@@ -56,7 +66,6 @@
       </div>
     </header>
 
-    <!-- 可拖拽的 Worker Quick Access 侧边栏 -->
     <aside id="worker-sidebar" class="worker-sidebar no-print" role="complementary" aria-label="Worker Quick Access">
       <div class="worker-sidebar-header">
         <h3>Worker Quick Access</h3>
@@ -73,9 +82,20 @@
         <div class="worker-list-container">
           <ul id="worker-list" class="worker-list" role="list" aria-label="Worker 列表"></ul>
         </div>
+
+        <div class="group-section">
+          <h4 class="sidebar-section-title">Groups（仅安排用）</h4>
+          <div class="group-create" role="group" aria-label="创建 Group">
+            <input id="group-name" type="text" placeholder="组名 如 NAKA" aria-label="Group 名称" />
+            <button id="create-group" type="button">Create Group</button>
+          </div>
+          <p class="group-hint">勾选上方工人 → Create；拖 Group 到格子会展开成个人</p>
+          <ul id="group-list" class="group-list" role="list" aria-label="Group 列表"></ul>
+        </div>
+
         <div class="worker-sidebar-footer">
           <span id="worker-total" aria-live="polite" aria-atomic="true">总数：0</span>
-          <span class="worker-hint">拖到右侧格子分配</span>
+          <span class="worker-hint">拖到右侧格子 · Cuti 行放休假</span>
         </div>
       </div>
       <div class="sidebar-drag-handle" id="sidebar-drag-handle" aria-label="拖拽侧边栏"></div>
@@ -88,8 +108,23 @@
         </div>
         <div class="board-header no-print">
           <h2 class="board-title">一周排班表</h2>
-          <p class="board-description">从左侧拖拽 Worker 到对应日期格子；同一天不可重复分配</p>
+          <p class="board-description">拖拽 Worker / Group；底部 Cuti 行管休假；Daily View 填群发详情</p>
         </div>
+
+        <div class="coverage-bar no-print" aria-label="人力覆盖">
+          <label class="coverage-day-label" for="coverage-day">对照日</label>
+          <select id="coverage-day" aria-label="选择对照星期">
+            <option value="mon">Mon</option>
+            <option value="tue">Tue</option>
+            <option value="wed">Wed</option>
+            <option value="thu">Thu</option>
+            <option value="fri">Fri</option>
+            <option value="sat">Sat</option>
+            <option value="sun">Sun</option>
+          </select>
+          <div id="coverage-panel" class="coverage-panel"></div>
+        </div>
+
         <div class="table-container">
           <div class="table-wrapper">
             <table id="schedule-table" role="table" aria-label="工作排班表">
@@ -126,12 +161,11 @@
 
     <footer class="app-footer no-print" role="contentinfo">
       <div class="footer-content">
-        <span>数据保存在浏览器本地（LocalStorage）。</span>
-        <span class="footer-hint">数据自动保存，无需手动操作 · 打印请用 Ctrl+P（A4 横向）</span>
+        <span>数据保存在浏览器本地（LocalStorage）。Actual 预留日后写库。</span>
+        <span class="footer-hint">打印 Ctrl+P（A4 横向）</span>
       </div>
     </footer>
 
-    <!-- 导出弹窗 -->
     <div id="export-modal" class="modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
       <div class="modal-backdrop" aria-hidden="true"></div>
       <div class="modal-content">
@@ -154,6 +188,7 @@
       </div>
     </div>
 
+    <script src="schedule-store.js"></script>
     <script src="main.js"></script>
     <script src="sidebar-drag.js"></script>
   </body>
