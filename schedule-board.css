@@ -210,9 +210,12 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
   top: 140px;
   left: 16px;
   width: 248px;
+  max-width: min(280px, calc(100vw - 32px));
   max-height: calc(100vh - 180px);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
+  /* Keep below sticky header but never paint over the board job column */
+  z-index: 40;
 }
 
 .schedule-board-page .worker-sidebar.collapsed {
@@ -522,7 +525,8 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 
 .schedule-board-page .layout {
   margin: 20px auto 0;
-  padding: 0 20px 24px 280px;
+  /* Must clear the sidebar (max ~280px) so Job Code inputs stay clickable */
+  padding: 0 20px 24px 300px;
 }
 
 .schedule-board-page .worker-input input {
@@ -898,17 +902,20 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 
 @media (max-width: 1050px) {
   .schedule-board-page .layout {
-    padding: 12px 12px 300px;
+    padding: 12px 12px 280px;
     max-width: 99vw;
   }
 
+  /* Override any inline drag position/size — dock bottom so Job Code stays usable */
   .schedule-board-page .worker-sidebar {
-    top: auto;
-    bottom: 16px;
-    left: 16px;
-    width: calc(100vw - 32px);
-    max-width: 420px;
-    max-height: 240px;
+    top: auto !important;
+    bottom: 16px !important;
+    left: 16px !important;
+    right: auto !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 420px !important;
+    max-height: 220px !important;
+    z-index: 60;
   }
 
   .schedule-board-page .worker-sidebar.collapsed {
