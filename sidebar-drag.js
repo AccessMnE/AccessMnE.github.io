@@ -129,16 +129,8 @@
     if (isMobileLayout()) {
       // Let CSS bottom-dock win; ignore saved desktop placement
       clearInlinePlacement();
-      // Keep collapsed by default so Job Code column is not covered
-      if (!sidebar.dataset.userToggled) {
-        sidebar.classList.add("collapsed");
-        toggleBtn.textContent = "+";
-      }
       return;
     }
-
-    sidebar.classList.remove("collapsed");
-    toggleBtn.textContent = "−";
 
     const savedPos = localStorage.getItem("workerSidebarPosition");
     if (savedPos) {
@@ -167,10 +159,6 @@
       }
     }
   }
-
-  toggleBtn.addEventListener("click", () => {
-    sidebar.dataset.userToggled = "1";
-  });
 
   applyResponsiveChrome();
   MOBILE_MQ.addEventListener("change", applyResponsiveChrome);

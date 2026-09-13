@@ -216,11 +216,33 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
   box-shadow: var(--shadow);
   /* Keep below sticky header but never paint over the board job column */
   z-index: 40;
+  user-select: none;
+}
+
+/* Inputs inside sidebar must remain typeable (parent has user-select:none) */
+.schedule-board-page .worker-sidebar input,
+.schedule-board-page .worker-sidebar textarea {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  pointer-events: auto;
 }
 
 .schedule-board-page .worker-sidebar.collapsed {
   transform: translateX(calc(-100% + 48px));
   opacity: 0.85;
+}
+
+/* Even when collapsed, keep quick-add visible so workers can still be added */
+.schedule-board-page .worker-sidebar.collapsed .worker-sidebar-content {
+  display: flex !important;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.schedule-board-page .worker-sidebar.collapsed .worker-list-container,
+.schedule-board-page .worker-sidebar.collapsed .group-section,
+.schedule-board-page .worker-sidebar.collapsed .worker-hint {
+  display: none !important;
 }
 
 .schedule-board-page .worker-sidebar-header {
@@ -919,7 +941,9 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
   }
 
   .schedule-board-page .worker-sidebar.collapsed {
-    transform: translateY(calc(100% - 48px));
+    transform: translateY(calc(100% - 120px));
+    max-height: 120px !important;
+    opacity: 1;
   }
 
   .schedule-board-page #schedule-table {
