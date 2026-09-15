@@ -128,7 +128,11 @@
   // —— Workers ——
   addWorkerBtn.addEventListener("click", () => {
     const name = (workerNameInput.value || "").trim();
-    if (!name) return;
+    if (!name) {
+      alert("Type a worker name first");
+      workerNameInput.focus();
+      return;
+    }
     if (state.workers.includes(name)) {
       alert("This worker already exists");
       return;
@@ -139,6 +143,7 @@
     renderWorkers();
     renderGroups();
     renderCoverage();
+    workerNameInput.focus();
   });
 
   workerNameInput.addEventListener("keydown", (e) => {
@@ -217,6 +222,14 @@
 
   function renderWorkers() {
     workerList.innerHTML = "";
+    if (!state.workers.length) {
+      const empty = document.createElement("li");
+      empty.className = "worker-list-empty";
+      empty.textContent = "No workers yet. Type a name in the box above, then Add.";
+      workerList.appendChild(empty);
+      workerTotal.textContent = "Total: 0";
+      return;
+    }
     state.workers.forEach((name) => {
       const li = document.createElement("li");
       li.className = "worker-item worker-draggable";

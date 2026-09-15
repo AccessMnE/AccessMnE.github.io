@@ -271,16 +271,81 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 
 .schedule-board-page .worker-sidebar-content {
   padding: 12px;
+  overflow-x: hidden;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.schedule-board-page .worker-input {
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.schedule-board-page .worker-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 38px;
+  width: auto;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.92em;
+  background: #fff;
+  color: #0f172a;
+  border: 1.5px solid #94a3b8;
+}
+
+.schedule-board-page .worker-input input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: none;
+}
+
+.schedule-board-page .worker-input button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 4.2em;
+  padding: 8px 12px;
+  font-size: 0.88em;
+  align-self: stretch;
 }
 
 .schedule-board-page .worker-list-container {
   flex: 1 1 auto;
-  max-height: 40vh;
+  min-height: 88px;
+  max-height: none;
+  overflow-y: auto;
+  margin-top: 0;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 6px;
+  background: #f8fafc;
+}
+
+.schedule-board-page .worker-list-empty {
+  margin: 0;
+  padding: 10px 6px;
+  font-size: 0.8em;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.schedule-board-page .group-section {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
 }
 
 .schedule-board-page .worker-sidebar-footer {
-  padding: 10px 4px 2px;
+  flex: 0 0 auto;
+  padding: 8px 4px 2px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -290,12 +355,6 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
   flex-shrink: 0;
   margin: 0;
   accent-color: var(--primary);
-}
-
-.schedule-board-page .group-section {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px dashed var(--border);
 }
 
 .schedule-board-page .sidebar-section-title {
@@ -549,21 +608,6 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
   margin: 20px auto 0;
   /* Must clear the sidebar (max ~280px) so Job Code inputs stay clickable */
   padding: 0 20px 24px 300px;
-}
-
-.schedule-board-page .worker-input input {
-  border-radius: var(--radius-sm);
-  font-size: 0.92em;
-}
-
-.schedule-board-page .worker-input input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-  outline: none;
-}
-
-.schedule-board-page .worker-input button {
-  font-size: 0.88em;
 }
 
 .schedule-board-page .worker-list {
@@ -936,13 +980,13 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
     right: auto !important;
     width: calc(100vw - 32px) !important;
     max-width: 420px !important;
-    max-height: 220px !important;
+    max-height: 320px !important;
     z-index: 60;
   }
 
   .schedule-board-page .worker-sidebar.collapsed {
-    transform: translateY(calc(100% - 120px));
-    max-height: 120px !important;
+    transform: translateY(calc(100% - 130px));
+    max-height: 130px !important;
     opacity: 1;
   }
 
