@@ -779,12 +779,35 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 
 .schedule-board-page .layout {
   margin: 16px auto 0;
-  /* Only clear left worker sidebar; right tools sidebar overlays (does not squeeze table) */
-  padding: 0 20px 24px 300px;
+  padding: 0 56px 24px;
+  max-width: 1520px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-body.schedule-board-page.tools-sidebar-collapsed .layout {
-  padding-right: 20px;
+.schedule-board-page .board {
+  width: 100%;
+  max-width: 100%;
+}
+
+.schedule-board-page .table-container,
+.schedule-board-page .table-wrapper {
+  width: 100%;
+}
+
+.schedule-board-page .board-header {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 0 2px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px 16px;
+  text-align: center;
 }
 
 .schedule-board-page .worker-list {
@@ -830,15 +853,6 @@ body.schedule-board-page.tools-sidebar-collapsed .layout {
 .schedule-board-page .worker-item .worker-remove:hover,
 .schedule-board-page .worker-item .worker-remove:focus-visible {
   transform: none;
-}
-
-.schedule-board-page .board-header {
-  margin-bottom: 14px;
-  padding: 0 2px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 16px;
 }
 
 .schedule-board-page .board-title {
@@ -1145,6 +1159,7 @@ body.schedule-board-page.tools-sidebar-collapsed .layout {
   .schedule-board-page .layout {
     padding: 12px 12px 280px;
     max-width: 99vw;
+    align-items: stretch;
   }
 
   .schedule-board-page .tools-sidebar {
