@@ -23,7 +23,11 @@
   const modeTabs = document.querySelectorAll("[data-board-mode]");
   const copyToActualBtn = document.getElementById("copy-to-actual");
   const openDailyBtn = document.getElementById("open-daily");
+  const printBoardBtn = document.getElementById("print-board");
   const boardModeLabel = document.getElementById("board-mode-label");
+  const toolsSidebar = document.getElementById("tools-sidebar");
+  const toolsSidebarToggle = document.getElementById("tools-sidebar-toggle");
+  const toolsSidebarOpen = document.getElementById("tools-sidebar-open");
 
   const exportBtn = document.getElementById("export-btn");
   const exportModal = document.getElementById("export-modal");
@@ -124,6 +128,45 @@
       window.open(url, "scheduleDaily", "noopener,noreferrer");
     });
   }
+
+  if (printBoardBtn) {
+    printBoardBtn.addEventListener("click", () => {
+      window.print();
+    });
+  }
+
+  function syncToolsSidebarChrome() {
+    if (!toolsSidebar) return;
+    const collapsed = toolsSidebar.classList.contains("collapsed");
+    document.body.classList.toggle("tools-sidebar-collapsed", collapsed);
+    if (toolsSidebarToggle) {
+      toolsSidebarToggle.textContent = collapsed ? "+" : "−";
+    }
+    if (toolsSidebarOpen) {
+      toolsSidebarOpen.hidden = !collapsed;
+    }
+  }
+
+  if (toolsSidebarToggle && toolsSidebar) {
+    toolsSidebarToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toolsSidebar.classList.toggle("collapsed");
+      syncToolsSidebarChrome();
+    });
+  }
+
+  if (toolsSidebarOpen && toolsSidebar) {
+    toolsSidebarOpen.addEventListener("click", () => {
+      toolsSidebar.classList.remove("collapsed");
+      syncToolsSidebarChrome();
+    });
+  }
+
+  // Default: collapse tools on narrow screens so the weekly table is readable
+  if (toolsSidebar && window.matchMedia("(max-width: 1050px)").matches) {
+    toolsSidebar.classList.add("collapsed");
+  }
+  syncToolsSidebarChrome();
 
   // —— Workers ——
   addWorkerBtn.addEventListener("click", () => {
@@ -425,6 +468,7 @@
 
         const subtotal = document.createElement("div");
         subtotal.className = "cell-subtotal";
+        subtotal.hidden = true;
         subtotal.textContent = `Count: ${assigned.length}`;
 
         dropArea.appendChild(badges);
@@ -488,6 +532,7 @@
 
       const subtotal = document.createElement("div");
       subtotal.className = "cell-subtotal";
+      subtotal.hidden = true;
       subtotal.textContent = assigned.length ? `Leave: ${assigned.length}` : "";
 
       dropArea.appendChild(badges);

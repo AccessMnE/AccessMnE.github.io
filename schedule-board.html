@@ -10,59 +10,18 @@
   </head>
   <body class="schedule-board-page" data-board-mode="planning">
     <header class="app-header no-print">
-      <div class="header-content">
+      <div class="header-content header-content-slim">
         <div class="header-title-section">
           <h1>Work Schedule Board</h1>
           <p class="header-subtitle">
             Weekly schedule · Mode: <span id="board-mode-label">Planning</span>
           </p>
         </div>
-        <nav class="actions" aria-label="Main actions">
-          <div class="action-group mode-tabs" role="group" aria-label="Planning / Actual">
-            <button type="button" class="mode-tab is-active" data-board-mode="planning">Planning</button>
-            <button type="button" class="mode-tab" data-board-mode="actual">Actual</button>
-            <button type="button" id="copy-to-actual" title="Overwrite Actual with Planning">Copy to Actual</button>
-          </div>
-          <div class="action-group primary-actions" role="group" aria-label="Schedule actions">
-            <button id="add-row" type="button" aria-label="Add Job Code row">
-              <span class="button-icon">+</span>
-              <span class="button-text">Add Job Code</span>
-            </button>
-            <button id="open-daily" type="button" aria-label="Open daily view">
-              <span class="button-text">Daily View</span>
-            </button>
-            <button id="clear-all" type="button" class="danger" aria-label="Clear all data">
-              <span class="button-text">Clear All</span>
-            </button>
-          </div>
-          <div class="export-controls" role="group" aria-label="Export">
-            <span class="export-label" aria-hidden="true">Export</span>
-            <div class="export-field">
-              <label for="export-day" class="sr-only">Select day</label>
-              <select id="export-day" title="Select day" aria-label="Select export day">
-                <option value="mon">Mon</option>
-                <option value="tue">Tue</option>
-                <option value="wed">Wed</option>
-                <option value="thu">Thu</option>
-                <option value="fri">Fri</option>
-                <option value="sat">Sat</option>
-                <option value="sun">Sun</option>
-              </select>
-            </div>
-            <div class="export-field">
-              <label for="export-date" class="sr-only">Date</label>
-              <input id="export-date" type="text" placeholder="Date e.g. 14/9/26" aria-label="Export date" />
-            </div>
-            <button id="export-btn" type="button" aria-label="Export text">
-              <span class="button-text">Export Text</span>
-            </button>
-          </div>
-          <div class="action-group navigation-actions" role="group" aria-label="Navigation">
-            <button type="button" class="home-btn" onclick="window.location.href='index.html'" aria-label="Back to Home" title="Home">
-              ← Home
-            </button>
-          </div>
-        </nav>
+        <div class="header-home-only">
+          <button type="button" class="home-btn" onclick="window.location.href='index.html'" aria-label="Back to Home" title="Home">
+            ← Home
+          </button>
+        </div>
       </div>
     </header>
 
@@ -101,17 +60,65 @@
       <div class="sidebar-drag-handle" id="sidebar-drag-handle" aria-label="Resize sidebar"></div>
     </aside>
 
-    <main class="layout">
-      <section class="board" role="region" aria-label="Schedule board">
-        <div class="print-only print-masthead" aria-hidden="true">
-          <h1>Weekly Schedule</h1>
-        </div>
-        <div class="board-header no-print">
-          <h2 class="board-title">Weekly Schedule</h2>
-          <p class="board-description">Drag workers / groups. Use the Cuti row for leave. Open Daily View for Jadual details.</p>
-        </div>
+    <aside id="tools-sidebar" class="tools-sidebar no-print" role="complementary" aria-label="Tools and coverage">
+      <div class="tools-sidebar-header">
+        <h3>Tools &amp; Coverage</h3>
+        <button type="button" class="sidebar-toggle" id="tools-sidebar-toggle" aria-label="Collapse or expand tools sidebar">−</button>
+      </div>
+      <div class="tools-sidebar-content">
+        <section class="tools-block" aria-label="Board mode">
+          <h4 class="sidebar-section-title">Board mode</h4>
+          <div class="action-group mode-tabs" role="group" aria-label="Planning / Actual">
+            <button type="button" class="mode-tab is-active" data-board-mode="planning">Planning</button>
+            <button type="button" class="mode-tab" data-board-mode="actual">Actual</button>
+          </div>
+          <button type="button" id="copy-to-actual" class="tools-full-btn" title="Overwrite Actual with Planning">
+            Copy to Actual
+          </button>
+        </section>
 
-        <div class="coverage-bar no-print" aria-label="Manpower coverage">
+        <section class="tools-block" aria-label="Schedule actions">
+          <h4 class="sidebar-section-title">Actions</h4>
+          <button id="add-row" type="button" class="tools-full-btn" aria-label="Add Job Code row">
+            <span class="button-icon">+</span>
+            <span class="button-text">Add Job Code</span>
+          </button>
+          <button id="open-daily" type="button" class="tools-full-btn" aria-label="Open daily view">
+            Daily View
+          </button>
+          <button id="print-board" type="button" class="tools-full-btn" aria-label="Print weekly schedule">
+            Print (A4 landscape)
+          </button>
+          <button id="clear-all" type="button" class="tools-full-btn danger" aria-label="Clear all data">
+            Clear All
+          </button>
+        </section>
+
+        <section class="tools-block export-controls" aria-label="Export">
+          <h4 class="sidebar-section-title">Export text</h4>
+          <div class="export-field">
+            <label for="export-day">Day</label>
+            <select id="export-day" title="Select day" aria-label="Select export day">
+              <option value="mon">Mon</option>
+              <option value="tue">Tue</option>
+              <option value="wed">Wed</option>
+              <option value="thu">Thu</option>
+              <option value="fri">Fri</option>
+              <option value="sat">Sat</option>
+              <option value="sun">Sun</option>
+            </select>
+          </div>
+          <div class="export-field">
+            <label for="export-date">Date</label>
+            <input id="export-date" type="text" placeholder="e.g. 14/9/26" aria-label="Export date" />
+          </div>
+          <button id="export-btn" type="button" class="tools-full-btn" aria-label="Export text">
+            Export Text
+          </button>
+        </section>
+
+        <section class="tools-block coverage-block" aria-label="Manpower coverage">
+          <h4 class="sidebar-section-title">Coverage</h4>
           <label class="coverage-day-label" for="coverage-day">Check day</label>
           <select id="coverage-day" aria-label="Coverage day">
             <option value="mon">Mon</option>
@@ -123,6 +130,22 @@
             <option value="sun">Sun</option>
           </select>
           <div id="coverage-panel" class="coverage-panel"></div>
+        </section>
+      </div>
+    </aside>
+
+    <button type="button" id="tools-sidebar-open" class="tools-sidebar-open no-print" aria-label="Open tools sidebar" title="Tools" hidden>
+      Tools
+    </button>
+
+    <main class="layout">
+      <section class="board" role="region" aria-label="Schedule board">
+        <div class="print-only print-masthead" aria-hidden="true">
+          <h1>Weekly Schedule</h1>
+        </div>
+        <div class="board-header no-print">
+          <h2 class="board-title">Weekly Schedule</h2>
+          <p class="board-description">Drag workers / groups. Use the Cuti row for leave. Open Daily View for Jadual details.</p>
         </div>
 
         <div class="table-container">
@@ -162,7 +185,7 @@
     <footer class="app-footer no-print" role="contentinfo">
       <div class="footer-content">
         <span>Saved in browser LocalStorage. Actual board is ready for a future database.</span>
-        <span class="footer-hint">Print: Ctrl+P (A4 landscape)</span>
+        <span class="footer-hint">Use Tools → Print for A4 landscape</span>
       </div>
     </footer>
 
