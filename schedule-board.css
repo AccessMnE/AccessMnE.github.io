@@ -499,7 +499,7 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.16);
   z-index: 48;
   display: flex;
   flex-direction: column;
@@ -779,12 +779,12 @@ body.schedule-board-page[data-board-mode="planning"] .board-title::after {
 
 .schedule-board-page .layout {
   margin: 16px auto 0;
-  /* Clear left worker sidebar + right tools sidebar */
-  padding: 0 310px 24px 300px;
+  /* Only clear left worker sidebar; right tools sidebar overlays (does not squeeze table) */
+  padding: 0 20px 24px 300px;
 }
 
 body.schedule-board-page.tools-sidebar-collapsed .layout {
-  padding-right: 24px;
+  padding-right: 20px;
 }
 
 .schedule-board-page .worker-list {
@@ -1042,6 +1042,7 @@ body.schedule-board-page.tools-sidebar-collapsed .layout {
   font-size: 0.88em;
   color: #1d4ed8;
   padding: 4px 8px 4px 10px;
+  max-width: 100%;
 }
 
 .schedule-board-page .badge .worker-name,
@@ -1050,6 +1051,10 @@ body.schedule-board-page.tools-sidebar-collapsed .layout {
   color: #1e40af;
   text-align: left;
   line-height: 1.25;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .schedule-board-page .badge .remove {
@@ -1140,10 +1145,6 @@ body.schedule-board-page.tools-sidebar-collapsed .layout {
   .schedule-board-page .layout {
     padding: 12px 12px 280px;
     max-width: 99vw;
-  }
-
-  body.schedule-board-page.tools-sidebar-collapsed .layout {
-    padding-right: 12px;
   }
 
   .schedule-board-page .tools-sidebar {
