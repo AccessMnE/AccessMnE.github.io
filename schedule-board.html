@@ -257,17 +257,11 @@
                 <option value="planning">Planning</option>
               </select>
             </label>
-            <label>
-              Rows
-              <select id="week-export-group">
-                <option value="worker">1 row per worker per day (Manday = 1)</option>
-                <option value="job">1 row per job per day (Manday = pax)</option>
-              </select>
-            </label>
             <span id="week-export-summary" class="week-export-summary"></span>
           </div>
           <p class="week-export-hint">
-            Columns match Labour Update: working_date (YYYY-MM-DD), remarks, working_details, job_code, manday. Cuti is not included.
+            1 row per job per day · manday = headcount · working_details = Work description from Daily View.
+            Columns match Labour Update (working_date as YYYY-MM-DD). Cuti is not included.
           </p>
           <ul id="week-export-warnings" class="week-export-warnings" hidden></ul>
           <label for="week-export-text" class="sr-only">Weekly export</label>

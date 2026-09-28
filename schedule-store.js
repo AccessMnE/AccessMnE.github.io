@@ -575,20 +575,32 @@
   const LABOUR_COLUMNS = ["working_date", "remarks", "working_details", "job_code", "manday"];
   const LABOUR_LIMITS = { remarks: 3, working_details: 64, job_code: 7, manday: 5 };
 
+  /** Work content from Daily View: Work description, else Site / title (Actual falls back to Planning). */
+  function workContentFor(week, mode, day, rowId) {
+    const modes = mode === "actual" ? ["actual", "planning"] : ["planning"];
+    for (const m of modes) {
+      const detail = getJobDetail(getDailyMeta(week, m, day), rowId);
+      const text = detail.description.trim() || detail.siteName.trim();
+      if (text) return text;
+    }
+    return "";
+  }
+
   /**
-   * groupBy "worker": one row per worker per job per day (manday 1, details = worker name)
-   * groupBy "job":    one row per job per day (manday = headcount, details = worker names)
+   * One row per job per day: manday = headcount, working_details = work content.
+   * A day without its own description reuses the same job's description from another day of the week.
    * Cuti is not labour, so it is excluded.
    */
-  function buildLabourRecords(week, weekKey, mode, groupBy) {
+  function buildLabourRecords(week, weekKey, mode) {
     const board = mode === "actual" ? week.actual : week.planning;
     const records = [];
     const warnings = [];
     let noJobCode = 0;
+    let noDetails = 0;
     const longJobCodes = new Set();
-    let truncatedDetails = 0;
+    const longDetails = new Set();
 
-    DAYS.forEach((day) => {
+    DAYS.forEach((day, dayIdx) => {
       const workingDate = toISODate(dayDate(weekKey, day));
       (board.rows || []).forEach((row) => {
         const workers = row.assignments[day] || [];
@@ -597,39 +609,39 @@
         if (!jobCode) noJobCode += 1;
         if (jobCode.length > LABOUR_LIMITS.job_code) longJobCodes.add(jobCode);
 
-        if (groupBy === "job") {
-          let details = workers.join(", ");
-          if (details.length > LABOUR_LIMITS.working_details) {
-            details = details.slice(0, LABOUR_LIMITS.working_details);
-            truncatedDetails += 1;
+        let details = workContentFor(week, mode, day, row.id);
+        if (!details) {
+          const otherDays = DAYS.slice(0, dayIdx).reverse().concat(DAYS.slice(dayIdx + 1));
+          for (const d of otherDays) {
+            details = workContentFor(week, mode, d, row.id);
+            if (details) break;
           }
-          records.push({
-            working_date: workingDate,
-            remarks: "",
-            working_details: details,
-            job_code: jobCode,
-            manday: String(workers.length),
-          });
-        } else {
-          workers.forEach((w) => {
-            records.push({
-              working_date: workingDate,
-              remarks: "",
-              working_details: w.slice(0, LABOUR_LIMITS.working_details),
-              job_code: jobCode,
-              manday: "1",
-            });
-          });
         }
+        if (!details) noDetails += 1;
+        if (details.length > LABOUR_LIMITS.working_details) {
+          longDetails.add(jobCode || details.slice(0, 20));
+          details = details.slice(0, LABOUR_LIMITS.working_details);
+        }
+
+        records.push({
+          working_date: workingDate,
+          remarks: "",
+          working_details: details,
+          job_code: jobCode,
+          manday: String(workers.length),
+        });
       });
     });
 
-    if (noJobCode) warnings.push(`${noJobCode} job/day entries have no Job Code.`);
+    if (noJobCode) warnings.push(`${noJobCode} rows have no Job Code.`);
+    if (noDetails) {
+      warnings.push(`${noDetails} rows have no work content — fill "Work description" in Daily View.`);
+    }
     if (longJobCodes.size) {
       warnings.push(`Job Code longer than 7 chars (will be cut on import): ${[...longJobCodes].join(", ")}`);
     }
-    if (truncatedDetails) {
-      warnings.push(`${truncatedDetails} rows: worker names cut to 64 chars (working_details limit).`);
+    if (longDetails.size) {
+      warnings.push(`Work content cut to 64 chars for: ${[...longDetails].join(", ")}`);
     }
     return { columns: LABOUR_COLUMNS.slice(), records, warnings };
   }

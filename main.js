@@ -53,14 +53,12 @@
   const weekExportBtn = document.getElementById("export-week-btn");
   const weekExportModal = document.getElementById("week-export-modal");
   const weekExportMode = document.getElementById("week-export-mode");
-  const weekExportGroup = document.getElementById("week-export-group");
   const weekExportSummary = document.getElementById("week-export-summary");
   const weekExportWarnings = document.getElementById("week-export-warnings");
   const weekExportText = document.getElementById("week-export-text");
   const weekExportCopy = document.getElementById("week-export-copy");
   const weekExportDownload = document.getElementById("week-export-download");
   const weekExportClose = document.getElementById("week-export-close");
-  const EXPORT_GROUP_KEY = "schedule_week_export_group";
 
   function persist() {
     S.saveState(state);
@@ -228,8 +226,7 @@
 
   function renderWeekExport() {
     const mode = weekExportMode.value === "planning" ? "planning" : "actual";
-    const groupBy = weekExportGroup.value === "job" ? "job" : "worker";
-    const data = S.buildLabourRecords(wk(), weekKey, mode, groupBy);
+    const data = S.buildLabourRecords(wk(), weekKey, mode);
     weekExportData = { ...data, mode };
 
     const totalManday = data.records.reduce((sum, r) => sum + Number(r.manday || 0), 0);
@@ -259,19 +256,12 @@
   }
 
   if (weekExportBtn && weekExportModal) {
-    const savedGroup = localStorage.getItem(EXPORT_GROUP_KEY);
-    if (savedGroup === "job" || savedGroup === "worker") weekExportGroup.value = savedGroup;
-
     weekExportBtn.addEventListener("click", () => {
       weekExportMode.value = hasAssignments(wk().actual) ? "actual" : "planning";
       renderWeekExport();
       weekExportModal.classList.remove("hidden");
     });
     weekExportMode.addEventListener("change", renderWeekExport);
-    weekExportGroup.addEventListener("change", () => {
-      localStorage.setItem(EXPORT_GROUP_KEY, weekExportGroup.value);
-      renderWeekExport();
-    });
     weekExportClose.addEventListener("click", () => weekExportModal.classList.add("hidden"));
 
     weekExportCopy.addEventListener("click", async () => {
