@@ -8,9 +8,12 @@
   const params = new URLSearchParams(location.search);
   let mode = params.get("mode") === "actual" ? "actual" : "planning";
   let day = S.DAYS.includes(params.get("day")) ? params.get("day") : "mon";
+  const weekKey = S.normalizeWeekKey(params.get("week")) || S.currentWeekKey();
 
   const state = S.loadState();
+  const week = S.getWeek(state, weekKey);
 
+  const dayWeek = document.getElementById("day-week");
   const dayMode = document.getElementById("day-mode");
   const daySelect = document.getElementById("day-select");
   const metaDate = document.getElementById("meta-date");
@@ -27,6 +30,14 @@
 
   dayMode.value = mode;
   daySelect.value = day;
+  if (dayWeek) dayWeek.textContent = S.formatWeekRange(weekKey);
+  [...daySelect.options].forEach((opt) => {
+    opt.textContent = `${opt.textContent} ${S.formatDayMonth(S.dayDate(weekKey, opt.value))}`;
+  });
+
+  function defaultDateLabel() {
+    return S.formatShortDate(S.dayDate(weekKey, day));
+  }
 
   function persist() {
     S.saveState(state);
@@ -34,6 +45,7 @@
 
   function syncUrl() {
     const url = new URL(location.href);
+    url.searchParams.set("week", weekKey);
     url.searchParams.set("day", day);
     url.searchParams.set("mode", mode);
     history.replaceState(null, "", url);
@@ -70,14 +82,14 @@
 
   function saveAll() {
     const meta = readMetaFromForm(collectJobsFromDom());
-    S.setDailyMeta(state, mode, day, meta);
+    S.setDailyMeta(week, mode, day, meta);
     persist();
     renderPreview();
   }
 
   function loadMetaToForm() {
-    const meta = S.getDailyMeta(state, mode, day);
-    metaDate.value = meta.dateLabel;
+    const meta = S.getDailyMeta(week, mode, day);
+    metaDate.value = meta.dateLabel || defaultDateLabel();
     metaPic.value = meta.pic;
     metaSupervisor.value = meta.supervisor;
     metaTime.value = meta.timeNotes;
@@ -86,12 +98,12 @@
   }
 
   function boardRows() {
-    return mode === "actual" ? state.actual.rows : state.planning.rows;
+    return mode === "actual" ? week.actual.rows : week.planning.rows;
   }
 
   function renderJobs() {
     jobsEditor.innerHTML = "";
-    const meta = S.getDailyMeta(state, mode, day);
+    const meta = S.getDailyMeta(week, mode, day);
     const active = boardRows().filter((r) => (r.assignments[day] || []).length > 0);
 
     if (!active.length) {
@@ -139,7 +151,7 @@
   }
 
   function renderCoverage() {
-    const c = S.coverageForDay(state, day, mode);
+    const c = S.coverageForDay(state, week, day, mode);
     dayCoverage.innerHTML =
       `<strong>Manpower check</strong><br>` +
       `Roster ${c.total} · Assigned ${c.assignedCount} · Cuti ${c.leaveCount} · Unassigned ${c.unassignedCount}` +
@@ -147,7 +159,7 @@
         ? `<div class="day-unassigned">Unassigned: ${c.unassigned.map(escapeHtml).join(", ")}</div>`
         : `<div class="day-ok">All covered</div>`);
 
-    const leave = state.leave[day] || [];
+    const leave = week.leave[day] || [];
     dayCuti.innerHTML = leave.length
       ? `<strong>Cuti</strong><ul>${leave.map((w) => `<li>${escapeHtml(w)}</li>`).join("")}</ul>`
       : `<strong>Cuti</strong><p class="muted">No one on leave</p>`;
@@ -156,8 +168,8 @@
   function renderPreview() {
     // Use in-memory form values without requiring save first
     const meta = readMetaFromForm(collectJobsFromDom());
-    S.setDailyMeta(state, mode, day, meta);
-    previewText.textContent = S.formatJadualText(state, mode, day);
+    S.setDailyMeta(week, mode, day, meta);
+    previewText.textContent = S.formatJadualText(week, weekKey, mode, day);
   }
 
   function fullRender() {
@@ -202,7 +214,7 @@
 
   document.getElementById("day-export").addEventListener("click", async () => {
     saveAll();
-    const text = S.formatJadualText(state, mode, day);
+    const text = S.formatJadualText(week, weekKey, mode, day);
     previewText.textContent = text;
     try {
       await navigator.clipboard.writeText(text);
@@ -220,7 +232,7 @@
 
   document.getElementById("day-back").addEventListener("click", () => {
     saveAll();
-    location.href = "schedule-board.html";
+    location.href = `schedule-board.html?week=${encodeURIComponent(weekKey)}`;
   });
 
   // Autosave on blur within meta / jobs

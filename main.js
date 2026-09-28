@@ -7,6 +7,8 @@
 
   const { DAYS, DAY_LABELS } = S;
   const state = S.loadState();
+  let weekKey =
+    S.normalizeWeekKey(new URLSearchParams(location.search).get("week")) || S.currentWeekKey();
 
   const addRowBtn = document.getElementById("add-row");
   const clearAllBtn = document.getElementById("clear-all");
@@ -20,14 +22,25 @@
   const createGroupBtn = document.getElementById("create-group");
   const coverageDay = document.getElementById("coverage-day");
   const coveragePanel = document.getElementById("coverage-panel");
-  const modeTabs = document.querySelectorAll("[data-board-mode]");
+  const modeTabs = document.querySelectorAll(".mode-tab[data-board-mode]");
   const copyToActualBtn = document.getElementById("copy-to-actual");
+  const copyPrevWeekBtn = document.getElementById("copy-prev-week");
   const openDailyBtn = document.getElementById("open-daily");
   const printBoardBtn = document.getElementById("print-board");
   const boardModeLabel = document.getElementById("board-mode-label");
   const toolsSidebar = document.getElementById("tools-sidebar");
   const toolsSidebarToggle = document.getElementById("tools-sidebar-toggle");
   const toolsSidebarOpen = document.getElementById("tools-sidebar-open");
+
+  const weekPrevBtn = document.getElementById("week-prev");
+  const weekNextBtn = document.getElementById("week-next");
+  const weekTodayBtn = document.getElementById("week-today");
+  const weekPickBtn = document.getElementById("week-pick");
+  const weekPicker = document.getElementById("week-picker");
+  const weekRangeEl = document.getElementById("week-range");
+  const weekNumberEl = document.getElementById("week-number");
+  const weekStatusEl = document.getElementById("week-status");
+  const printWeekRange = document.getElementById("print-week-range");
 
   const exportBtn = document.getElementById("export-btn");
   const exportModal = document.getElementById("export-modal");
@@ -37,16 +50,37 @@
   const exportDay = document.getElementById("export-day");
   const exportDate = document.getElementById("export-date");
 
+  const weekExportBtn = document.getElementById("export-week-btn");
+  const weekExportModal = document.getElementById("week-export-modal");
+  const weekExportMode = document.getElementById("week-export-mode");
+  const weekExportGroup = document.getElementById("week-export-group");
+  const weekExportSummary = document.getElementById("week-export-summary");
+  const weekExportWarnings = document.getElementById("week-export-warnings");
+  const weekExportText = document.getElementById("week-export-text");
+  const weekExportCopy = document.getElementById("week-export-copy");
+  const weekExportDownload = document.getElementById("week-export-download");
+  const weekExportClose = document.getElementById("week-export-close");
+  const EXPORT_GROUP_KEY = "schedule_week_export_group";
+
   function persist() {
     S.saveState(state);
   }
 
+  function wk() {
+    return S.getWeek(state, weekKey);
+  }
+
   function rows() {
-    return S.getRows(state);
+    return S.getRows(state, wk());
   }
 
   function currentMode() {
-    return state.ui?.boardMode === "actual" ? "actual" : "planning";
+    return S.boardModeOf(state);
+  }
+
+  function todayDayInWeek() {
+    if (weekKey !== S.currentWeekKey()) return null;
+    return DAYS[(new Date().getDay() + 6) % 7];
   }
 
   function refreshModeUI() {
@@ -71,7 +105,89 @@
     renderCoverage();
   }
 
-  // —— Export (simple TSV, unchanged spirit) ——
+  // —— Week navigation ——
+  function weekStatusText() {
+    const diff = Math.round(
+      (S.dayDate(weekKey, "mon") - S.dayDate(S.currentWeekKey(), "mon")) / (7 * 86400000)
+    );
+    if (diff === 0) return { text: "This week", cls: "is-current" };
+    if (diff === -1) return { text: "Last week", cls: "is-past" };
+    if (diff === 1) return { text: "Next week", cls: "is-future" };
+    return diff < 0
+      ? { text: `${-diff} weeks ago`, cls: "is-past" }
+      : { text: `In ${diff} weeks`, cls: "is-future" };
+  }
+
+  function renderWeekHeader() {
+    const range = S.formatWeekRange(weekKey);
+    const weekNo = `W${S.isoWeekNumber(S.dayDate(weekKey, "mon"))}`;
+    if (weekRangeEl) weekRangeEl.textContent = range;
+    if (weekNumberEl) weekNumberEl.textContent = weekNo;
+    if (printWeekRange) printWeekRange.textContent = `· ${range} (${weekNo})`;
+    if (weekPicker) weekPicker.value = weekKey;
+
+    const status = weekStatusText();
+    if (weekStatusEl) {
+      weekStatusEl.textContent = status.text;
+      weekStatusEl.className = `week-status ${status.cls}`;
+    }
+    if (weekTodayBtn) weekTodayBtn.hidden = status.cls === "is-current";
+
+    const today = todayDayInWeek();
+    document.querySelectorAll("#schedule-table th[data-day]").forEach((th) => {
+      const day = th.dataset.day;
+      const date = S.dayDate(weekKey, day);
+      const dateEl = th.querySelector(".th-date");
+      if (dateEl) dateEl.textContent = S.formatDayMonth(date);
+      th.title = `${DAY_LABELS[day]} ${S.formatShortDate(date)}`;
+      th.classList.toggle("is-today", day === today);
+    });
+
+    document.title = `Work Schedule Board · ${range}`;
+    const url = new URL(location.href);
+    if (weekKey === S.currentWeekKey()) url.searchParams.delete("week");
+    else url.searchParams.set("week", weekKey);
+    history.replaceState(null, "", url);
+
+    syncExportDate();
+  }
+
+  function setWeek(key) {
+    if (!key || key === weekKey) return;
+    weekKey = key;
+    renderWeekHeader();
+    renderTable();
+    renderCoverage();
+  }
+
+  if (weekPrevBtn) weekPrevBtn.addEventListener("click", () => setWeek(S.shiftWeek(weekKey, -1)));
+  if (weekNextBtn) weekNextBtn.addEventListener("click", () => setWeek(S.shiftWeek(weekKey, 1)));
+  if (weekTodayBtn) weekTodayBtn.addEventListener("click", () => setWeek(S.currentWeekKey()));
+  if (weekPickBtn && weekPicker) {
+    weekPickBtn.addEventListener("click", () => {
+      if (typeof weekPicker.showPicker === "function") {
+        try {
+          weekPicker.showPicker();
+          return;
+        } catch {
+          /* fall back to focus */
+        }
+      }
+      weekPicker.focus();
+      weekPicker.click();
+    });
+    weekPicker.addEventListener("change", () => {
+      setWeek(S.normalizeWeekKey(weekPicker.value));
+    });
+  }
+
+  // —— Export day text (simple TSV) ——
+  function syncExportDate() {
+    if (exportDate && exportDay) {
+      exportDate.value = S.formatShortDate(S.dayDate(weekKey, exportDay.value));
+    }
+  }
+
   if (exportBtn && exportModal && exportText && exportCopy && exportClose && exportDay && exportDate) {
     exportBtn.addEventListener("click", () => {
       const day = exportDay.value;
@@ -85,7 +201,7 @@
           output += `${row.jobCode || "-"}\t${w}\n`;
         });
       });
-      const leave = state.leave[day] || [];
+      const leave = wk().leave[day] || [];
       if (leave.length) {
         leave.forEach((w) => {
           output += `Cuti\t${w}\n`;
@@ -103,6 +219,86 @@
     });
   }
 
+  // —— Export week (labour records) ——
+  let weekExportData = null;
+
+  function hasAssignments(board) {
+    return (board.rows || []).some((r) => DAYS.some((d) => (r.assignments[d] || []).length));
+  }
+
+  function renderWeekExport() {
+    const mode = weekExportMode.value === "planning" ? "planning" : "actual";
+    const groupBy = weekExportGroup.value === "job" ? "job" : "worker";
+    const data = S.buildLabourRecords(wk(), weekKey, mode, groupBy);
+    weekExportData = { ...data, mode };
+
+    const totalManday = data.records.reduce((sum, r) => sum + Number(r.manday || 0), 0);
+    weekExportSummary.textContent =
+      `${S.formatWeekRange(weekKey)} · ${data.records.length} rows · ${totalManday} manday`;
+
+    const warnings = data.warnings.slice();
+    if (!data.records.length) {
+      warnings.unshift(`No one assigned on the ${mode === "actual" ? "Actual" : "Planning"} board this week.`);
+    }
+    weekExportWarnings.innerHTML = "";
+    warnings.forEach((w) => {
+      const li = document.createElement("li");
+      li.textContent = w;
+      weekExportWarnings.appendChild(li);
+    });
+    weekExportWarnings.hidden = warnings.length === 0;
+
+    weekExportText.value = S.recordsToDelimited(data.columns, data.records, "\t");
+  }
+
+  function flashButton(btn, text) {
+    const label = btn.querySelector(".button-text") || btn;
+    const original = label.textContent;
+    label.textContent = text;
+    setTimeout(() => (label.textContent = original), 1200);
+  }
+
+  if (weekExportBtn && weekExportModal) {
+    const savedGroup = localStorage.getItem(EXPORT_GROUP_KEY);
+    if (savedGroup === "job" || savedGroup === "worker") weekExportGroup.value = savedGroup;
+
+    weekExportBtn.addEventListener("click", () => {
+      weekExportMode.value = hasAssignments(wk().actual) ? "actual" : "planning";
+      renderWeekExport();
+      weekExportModal.classList.remove("hidden");
+    });
+    weekExportMode.addEventListener("change", renderWeekExport);
+    weekExportGroup.addEventListener("change", () => {
+      localStorage.setItem(EXPORT_GROUP_KEY, weekExportGroup.value);
+      renderWeekExport();
+    });
+    weekExportClose.addEventListener("click", () => weekExportModal.classList.add("hidden"));
+
+    weekExportCopy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(weekExportText.value);
+      } catch {
+        weekExportText.select();
+        document.execCommand("copy");
+      }
+      flashButton(weekExportCopy, "Copied");
+    });
+
+    weekExportDownload.addEventListener("click", () => {
+      if (!weekExportData) return;
+      const csv = S.recordsToDelimited(weekExportData.columns, weekExportData.records, ",");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `labour_${weekKey}_${weekExportData.mode}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      flashButton(weekExportDownload, "Downloaded");
+    });
+  }
+
   // —— Mode / copy / daily ——
   modeTabs.forEach((btn) => {
     btn.addEventListener("click", () => setMode(btn.dataset.boardMode));
@@ -110,8 +306,8 @@
 
   if (copyToActualBtn) {
     copyToActualBtn.addEventListener("click", () => {
-      if (!confirm("Overwrite Actual with the current Planning board?")) return;
-      S.copyPlanningToActual(state);
+      if (!confirm(`Overwrite Actual with Planning for ${S.formatWeekRange(weekKey)}?`)) return;
+      S.copyPlanningToActual(wk());
       persist();
       alert("Copied Planning → Actual");
       if (currentMode() === "actual") {
@@ -121,10 +317,34 @@
     });
   }
 
+  if (copyPrevWeekBtn) {
+    copyPrevWeekBtn.addEventListener("click", () => {
+      const prevKey = S.shiftWeek(weekKey, -1);
+      const prev = state.weeks[prevKey];
+      if (!prev || !prev.planning.rows.length) {
+        alert(`Last week (${S.formatWeekRange(prevKey)}) has no Planning rows to copy.`);
+        return;
+      }
+      const msg = wk().planning.rows.length
+        ? `Replace this week's Planning with last week's (${S.formatWeekRange(prevKey)})?`
+        : `Copy Planning from last week (${S.formatWeekRange(prevKey)})?`;
+      if (!confirm(msg)) return;
+      S.copyPlanningFromWeek(state, prevKey, weekKey);
+      persist();
+      if (currentMode() !== "planning") setMode("planning");
+      else {
+        renderTable();
+        renderCoverage();
+      }
+    });
+  }
+
   if (openDailyBtn) {
     openDailyBtn.addEventListener("click", () => {
       const day = (coverageDay && coverageDay.value) || (exportDay && exportDay.value) || "mon";
-      const url = `schedule-day.html?day=${encodeURIComponent(day)}&mode=${encodeURIComponent(currentMode())}`;
+      const url =
+        `schedule-day.html?week=${encodeURIComponent(weekKey)}` +
+        `&day=${encodeURIComponent(day)}&mode=${encodeURIComponent(currentMode())}`;
       window.open(url, "scheduleDaily", "noopener,noreferrer");
     });
   }
@@ -228,16 +448,14 @@
   });
 
   clearAllBtn.addEventListener("click", () => {
-    if (!confirm("Clear ALL data? (Planning, Actual, Groups, Cuti)")) return;
-    state.workers = [];
-    state.groups = [];
-    state.leave = S.emptyDayMap(() => []);
-    state.planning = { rows: [] };
-    state.actual = { rows: [] };
-    state.daily = {};
+    if (
+      !confirm(
+        `Clear week ${S.formatWeekRange(weekKey)}?\n(Planning, Actual, Cuti and Daily details of this week. Workers and groups are kept.)`
+      )
+    )
+      return;
+    S.clearWeek(state, weekKey);
     persist();
-    renderWorkers();
-    renderGroups();
     renderTable();
     renderCoverage();
   });
@@ -245,18 +463,20 @@
   if (coverageDay) {
     coverageDay.addEventListener("change", () => {
       if (exportDay) exportDay.value = coverageDay.value;
+      syncExportDate();
       renderCoverage();
     });
   }
   if (exportDay && coverageDay) {
     exportDay.addEventListener("change", () => {
       coverageDay.value = exportDay.value;
+      syncExportDate();
       renderCoverage();
     });
   }
 
   function removeRow(rowId) {
-    const board = S.getBoard(state);
+    const board = S.getBoard(state, wk());
     board.rows = board.rows.filter((r) => r.id !== rowId);
     persist();
     renderTable();
@@ -293,6 +513,7 @@
       del.type = "button";
       del.className = "worker-remove";
       del.textContent = "Del";
+      del.title = "Remove from roster, groups, and this/future weeks (past weeks keep history)";
       del.addEventListener("click", () => {
         S.removeWorkerEverywhere(state, name);
         persist();
@@ -421,7 +642,20 @@
 
   function renderTable() {
     tableBody.innerHTML = "";
+    const week = wk();
     const boardRows = rows();
+    const today = todayDayInWeek();
+
+    if (!boardRows.length) {
+      const tr = document.createElement("tr");
+      tr.className = "empty-week-row no-print";
+      const td = document.createElement("td");
+      td.colSpan = DAYS.length + 2;
+      td.textContent =
+        "No job codes for this week yet — use Tools → Add Job Code, or Copy Last Week → Planning.";
+      tr.appendChild(td);
+      tableBody.appendChild(tr);
+    }
 
     boardRows.forEach((row) => {
       const tr = document.createElement("tr");
@@ -449,6 +683,7 @@
 
       DAYS.forEach((day) => {
         const td = document.createElement("td");
+        if (day === today) td.classList.add("is-today");
         const dropArea = document.createElement("div");
         const assigned = row.assignments[day] || [];
         dropArea.className = assigned.length === 0 ? "droppable is-empty" : "droppable";
@@ -475,7 +710,7 @@
         dropArea.appendChild(subtotal);
 
         bindDroppable(dropArea, (names) => {
-          const result = S.assignNamesToCell(state, row, day, names, { rows: boardRows });
+          const result = S.assignNamesToCell(week, row, day, names, { rows: boardRows });
           if (result.added.length) {
             persist();
             renderTable();
@@ -512,8 +747,9 @@
 
     DAYS.forEach((day) => {
       const td = document.createElement("td");
+      if (day === today) td.classList.add("is-today");
       const dropArea = document.createElement("div");
-      const assigned = state.leave[day] || [];
+      const assigned = week.leave[day] || [];
       dropArea.className =
         assigned.length === 0 ? "droppable cuti-drop is-empty" : "droppable cuti-drop";
 
@@ -522,7 +758,7 @@
       assigned.forEach((w) => {
         badges.appendChild(
           createBadge(w, () => {
-            state.leave[day] = state.leave[day].filter((x) => x !== w);
+            week.leave[day] = week.leave[day].filter((x) => x !== w);
             persist();
             renderTable();
             renderCoverage();
@@ -548,8 +784,8 @@
             });
             changed = true;
           }
-          if (!(state.leave[day] || []).includes(name)) {
-            state.leave[day].push(name);
+          if (!(week.leave[day] || []).includes(name)) {
+            week.leave[day].push(name);
             changed = true;
           }
         });
@@ -588,13 +824,13 @@
   function renderCoverage() {
     if (!coveragePanel) return;
     const day = coverageDay ? coverageDay.value : "mon";
-    const c = S.coverageForDay(state, day, currentMode());
+    const c = S.coverageForDay(state, wk(), day, currentMode());
     coveragePanel.innerHTML = "";
 
     const summary = document.createElement("div");
     summary.className = "coverage-summary";
     summary.innerHTML =
-      `<strong>${DAY_LABELS[day]}</strong> · ` +
+      `<strong>${DAY_LABELS[day]} ${S.formatShortDate(S.dayDate(weekKey, day))}</strong> · ` +
       `Roster ${c.total} · Assigned ${c.assignedCount} · Cuti ${c.leaveCount} · ` +
       `<span class="coverage-gap">Unassigned ${c.unassignedCount}</span>`;
     coveragePanel.appendChild(summary);
@@ -643,8 +879,14 @@
     }
   }
 
-  // Init
+  // Init: default the day pickers to today when viewing the current week
+  const initialDay = todayDayInWeek();
+  if (initialDay) {
+    if (coverageDay) coverageDay.value = initialDay;
+    if (exportDay) exportDay.value = initialDay;
+  }
   refreshModeUI();
+  renderWeekHeader();
   renderWorkers();
   renderGroups();
   renderTable();

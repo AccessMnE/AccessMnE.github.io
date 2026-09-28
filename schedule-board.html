@@ -83,19 +83,29 @@
             <span class="button-icon">+</span>
             <span class="button-text">Add Job Code</span>
           </button>
+          <button id="copy-prev-week" type="button" class="tools-full-btn" title="Copy last week's Planning (job codes + crew) into this week's Planning">
+            Copy Last Week → Planning
+          </button>
           <button id="open-daily" type="button" class="tools-full-btn" aria-label="Open daily view">
             Daily View
           </button>
           <button id="print-board" type="button" class="tools-full-btn" aria-label="Print weekly schedule">
             Print (A4 landscape)
           </button>
-          <button id="clear-all" type="button" class="tools-full-btn danger" aria-label="Clear all data">
-            Clear All
+          <button id="clear-all" type="button" class="tools-full-btn danger" aria-label="Clear this week" title="Clears Planning, Actual, Cuti and Daily details of the week shown (workers and groups are kept)">
+            Clear This Week
+          </button>
+        </section>
+
+        <section class="tools-block export-controls" aria-label="Export week">
+          <h4 class="sidebar-section-title">Export week</h4>
+          <button id="export-week-btn" type="button" class="tools-full-btn" title="Whole week as labour records (CSV / Excel)">
+            Export Week (Labour)
           </button>
         </section>
 
         <section class="tools-block export-controls" aria-label="Export">
-          <h4 class="sidebar-section-title">Export text</h4>
+          <h4 class="sidebar-section-title">Export day text</h4>
           <div class="export-field">
             <label for="export-day">Day</label>
             <select id="export-day" title="Select day" aria-label="Select export day">
@@ -110,7 +120,7 @@
           </div>
           <div class="export-field">
             <label for="export-date">Date</label>
-            <input id="export-date" type="text" placeholder="e.g. 14/9/26" aria-label="Export date" />
+            <input id="export-date" type="text" placeholder="e.g. 14/9/26" aria-label="Export date" title="Auto-filled from the week shown; you can still edit it" />
           </div>
           <button id="export-btn" type="button" class="tools-full-btn" aria-label="Export text">
             Export Text
@@ -141,11 +151,21 @@
     <main class="layout">
       <section class="board" role="region" aria-label="Schedule board">
         <div class="print-only print-masthead" aria-hidden="true">
-          <h1>Weekly Schedule</h1>
+          <h1>Weekly Schedule <span id="print-week-range" class="print-week-range"></span></h1>
         </div>
         <div class="board-header no-print">
-          <h2 class="board-title">Weekly Schedule</h2>
-          <p class="board-description">Drag workers / groups. Use the Cuti row for leave. Open Daily View for Jadual details.</p>
+          <h2 class="board-title" title="Drag workers / groups. Use the Cuti row for leave. Open Daily View for Jadual details.">Weekly Schedule</h2>
+          <div class="week-nav" role="group" aria-label="Choose week">
+            <button type="button" id="week-prev" class="week-nav-btn" title="Previous week (Alt + ←)" aria-label="Previous week">‹</button>
+            <button type="button" id="week-pick" class="week-label" title="Click to pick any date — jumps to that week">
+              <span id="week-range"></span>
+              <span id="week-number" class="week-number"></span>
+            </button>
+            <input type="date" id="week-picker" class="week-picker" tabindex="-1" aria-label="Pick a date to jump to its week" />
+            <button type="button" id="week-next" class="week-nav-btn" title="Next week (Alt + →)" aria-label="Next week">›</button>
+            <button type="button" id="week-today" class="week-today" title="Jump back to the current week">This week</button>
+            <span id="week-status" class="week-status" aria-live="polite"></span>
+          </div>
         </div>
 
         <div class="table-container">
@@ -165,13 +185,13 @@
               <thead>
                 <tr>
                   <th class="col-job" scope="col">Job Code</th>
-                  <th class="col-day" scope="col">Mon</th>
-                  <th class="col-day" scope="col">Tue</th>
-                  <th class="col-day" scope="col">Wed</th>
-                  <th class="col-day" scope="col">Thu</th>
-                  <th class="col-day" scope="col">Fri</th>
-                  <th class="col-day" scope="col">Sat</th>
-                  <th class="col-day" scope="col">Sun</th>
+                  <th class="col-day" scope="col" data-day="mon"><span class="th-date"></span><span class="th-day">Mon</span></th>
+                  <th class="col-day" scope="col" data-day="tue"><span class="th-date"></span><span class="th-day">Tue</span></th>
+                  <th class="col-day" scope="col" data-day="wed"><span class="th-date"></span><span class="th-day">Wed</span></th>
+                  <th class="col-day" scope="col" data-day="thu"><span class="th-date"></span><span class="th-day">Thu</span></th>
+                  <th class="col-day" scope="col" data-day="fri"><span class="th-date"></span><span class="th-day">Fri</span></th>
+                  <th class="col-day" scope="col" data-day="sat"><span class="th-date"></span><span class="th-day">Sat</span></th>
+                  <th class="col-day" scope="col" data-day="sun"><span class="th-date"></span><span class="th-day">Sun</span></th>
                   <th class="col-op no-print" scope="col">Operation</th>
                 </tr>
               </thead>
@@ -207,6 +227,51 @@
         <div class="modal-body">
           <label for="export-text" class="sr-only">Export text</label>
           <textarea id="export-text" class="export-text" rows="16" aria-label="Exported schedule text" readonly></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div id="week-export-modal" class="modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="week-export-title">
+      <div class="modal-backdrop" aria-hidden="true"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="week-export-title">Export Week · Labour</h3>
+          <div class="modal-actions">
+            <button id="week-export-copy" type="button" class="copy-btn" title="Copy as tab-separated text (paste into Excel / Google Sheets)">
+              <span class="button-text">Copy (Excel)</span>
+            </button>
+            <button id="week-export-download" type="button" class="copy-btn" title="Download a .csv file">
+              <span class="button-text">Download CSV</span>
+            </button>
+            <button id="week-export-close" type="button" class="close-btn" aria-label="Close">
+              <span class="button-text">Close</span>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="week-export-options">
+            <label>
+              Board
+              <select id="week-export-mode">
+                <option value="actual">Actual</option>
+                <option value="planning">Planning</option>
+              </select>
+            </label>
+            <label>
+              Rows
+              <select id="week-export-group">
+                <option value="worker">1 row per worker per day (Manday = 1)</option>
+                <option value="job">1 row per job per day (Manday = pax)</option>
+              </select>
+            </label>
+            <span id="week-export-summary" class="week-export-summary"></span>
+          </div>
+          <p class="week-export-hint">
+            Columns match Labour Update: working_date (YYYY-MM-DD), remarks, working_details, job_code, manday. Cuti is not included.
+          </p>
+          <ul id="week-export-warnings" class="week-export-warnings" hidden></ul>
+          <label for="week-export-text" class="sr-only">Weekly export</label>
+          <textarea id="week-export-text" class="export-text" rows="14" readonly></textarea>
         </div>
       </div>
     </div>
