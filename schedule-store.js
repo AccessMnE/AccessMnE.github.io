@@ -340,26 +340,37 @@
     return `${mode === "actual" ? "actual" : "planning"}:${day}`;
   }
 
+  /** Used when a day's header fields were never filled (all blank); any filled field keeps the saved values. */
+  const DAILY_DEFAULTS = {
+    timeNotes: "PGEO / Volac / Bahru / IKD - 8.30am-6.30pm\nSite Lain - 8.00am-6.00pm",
+    pic: "JJ",
+    supervisor: "Federick",
+    preamble: "Masuk Access 6 PAGI",
+    materials: "Francis / Abdil",
+  };
+
   function getDailyMeta(week, mode, day) {
-    const cur = week.daily?.[dailyKey(mode, day)];
+    const cur =
+      week.daily?.[dailyKey(mode, day)] ||
+      (mode === "actual" ? week.daily?.[dailyKey("planning", day)] : null);
     if (cur && typeof cur === "object") {
-      return {
-        dateLabel: cur.dateLabel || "",
+      const header = {
         timeNotes: cur.timeNotes || "",
         pic: cur.pic || "",
         supervisor: cur.supervisor || "",
         preamble: cur.preamble || "",
         materials: cur.materials || "",
+      };
+      const neverFilled = Object.values(header).every((v) => !String(v).trim());
+      return {
+        dateLabel: cur.dateLabel || "",
+        ...(neverFilled ? DAILY_DEFAULTS : header),
         jobs: cur.jobs && typeof cur.jobs === "object" ? cur.jobs : {},
       };
     }
     return {
       dateLabel: "",
-      timeNotes: "",
-      pic: "",
-      supervisor: "",
-      preamble: "",
-      materials: "",
+      ...DAILY_DEFAULTS,
       jobs: {},
     };
   }
